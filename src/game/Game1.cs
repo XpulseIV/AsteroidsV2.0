@@ -1,29 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace AsteroidsV2._0
 {
-    public class Game1 : Game
+    internal sealed class Game1 : Game
     {
-        internal GraphicsDeviceManager _graphics;
-        private PixelRenderer _pixelRenderer;
+        internal readonly GraphicsDeviceManager Graphics;
+        public PixelRenderer _pixelRenderer;
 
-        private List<SpaceObject> _asteroids = new();
-        private List<SpaceObject> _bullets = new();
-        public SpaceObject _player;
+        private readonly List<SpaceObject> _asteroids = new();
+        private readonly List<SpaceObject> _bullets = new();
+        private SpaceObject _player;
         private bool _dead;
         private int _score = 0;
 
         private List<Vector2> _shipModel;
-        private List<Vector2> _asteroidModel = new();
+        private readonly List<Vector2> _asteroidModel = new();
 
         public Game1()
         {
-            this._graphics = new(this);
+            this.Graphics = new(this);
             this.Content.RootDirectory = "Content";
             this.IsMouseVisible = true;
         }
@@ -33,7 +31,7 @@ namespace AsteroidsV2._0
             base.Initialize();
 
             // Fix render stuff
-            this._pixelRenderer = new(GraphicsDevice,this);
+            this._pixelRenderer = new(this.GraphicsDevice, this);
             this._pixelRenderer.SetupWindow();
 
             // Actual game logic
@@ -41,7 +39,7 @@ namespace AsteroidsV2._0
             {
                 new(0.0f, -5.0f),
                 new(-2.5f, 2.5f),
-                new(2.5f, 2.5f),
+                new(2.5f, 2.5f)
             };
 
             const int verts = 20;
@@ -52,27 +50,25 @@ namespace AsteroidsV2._0
                     noise * MathF.Cos((i / (float)verts) * 6.28318f)));
             }
 
-            ResetGame();
+            this.ResetGame();
         }
 
-        void ResetGame()
+        private void ResetGame()
         {
-            _player = new(this._shipModel, new(PixelRenderer.RenderWidth / 2f, PixelRenderer.RenderHeight / 2f), new(0, 0), 0, 1);
+            this._player = new(this, this._shipModel, new(PixelRenderer.RenderWidth / 2f, PixelRenderer.RenderHeight / 2f), new(0, 0), 0, 1);
 
-            _bullets.Clear();
-            _asteroids.Clear();
+            this._bullets.Clear();
+            this._asteroids.Clear();
 
-            _asteroids.Add(new(this._asteroidModel, new(20.0f, 20.0f), new(8.0f, -6.0f), 0.0f, 16));
-            _asteroids.Add(new(this._asteroidModel, new(100.0f, 20.0f), new(-5.0f, 3.0f), 0.0f, 16));
+            this._asteroids.Add(new(this, this._asteroidModel, new(20.0f, 20.0f), new(8.0f, -6.0f), 0.0f, 8));
+            this._asteroids.Add(new(this, this._asteroidModel, new(100.0f, 20.0f), new(-5.0f, 3.0f), 0.0f, 8));
 
             this._dead = false;
-            _score = 0;
+            this._score = 0;
         }
 
-        private bool IsPointInsideCircle(float cx, float cy, float radius, float x, float y)
-        {
-            return MathF.Sqrt((x-cx)*(x-cx) + (y-cy)*(y-cy)) < radius;
-        }
+        private static bool IsPointInsideCircle(float cx, float cy, float radius, float x, float y) => MathF.Sqrt((x -
+            cx) * (x - cx) + (y - cy) * (y - cy)) < radius;
 
         protected override void Update(GameTime gameTime)
         {
@@ -86,45 +82,35 @@ namespace AsteroidsV2._0
             if (this._dead) this.ResetGame();
 
             // Steer Ship
-            if (keyboard.IsKeyDown(Keys.Left))
-                _player._angle -= 5.0f * elapsedTime;
-            if (keyboard.IsKeyDown(Keys.Right))
-                _player._angle += 5.0f * elapsedTime;
+            if (keyboard.IsKeyDown(Keys.Left)) this._player.Angle -= 5.0f * elapsedTime;
+            if (keyboard.IsKeyDown(Keys.Right)) this._player.Angle += 5.0f * elapsedTime;
 
             // Thrust Apply accel
             if (keyboard.IsKeyDown(Keys.Up))
             {
                 // ACCELERATION changes VELOCITY (with respect to time)
-                _player._dPos.X += MathF.Sin(_player._angle) * 20.0f * elapsedTime;
-                _player._dPos.Y += -MathF.Cos(_player._angle) * 20.0f * elapsedTime;
+                this._player.DPos.X += MathF.Sin(this._player.Angle) * 20.0f * elapsedTime;
+                this._player.DPos.Y += -MathF.Cos(this._player.Angle) * 20.0f * elapsedTime;
             }
-
-            // VELOCITY changes POSITION (with respect to time)
-            this._player._pos += this._player._dPos * elapsedTime;
-
-            // Keep ship in gamespace
-            this._player._pos = PixelRenderer.Wrap(this._player._pos);
 
             // Check ship collision with asteroids
             for (int i = 0; i < this._asteroids.Count; i++)
             {
-                if (this.IsPointInsideCircle(this._asteroids[i]._pos.X, this._asteroids[i]._pos.Y, this._asteroids[i]._size * 2 /* Radius be damned */, this._player._pos.X, this._player._pos.Y))
+                if (Game1.IsPointInsideCircle(this._asteroids[i].Pos.X, this._asteroids[i].Pos.Y, this._asteroids[i].Size * 2 /* Radius be damned */, this._player.Pos.X, this._player.Pos.Y))
                     this._dead = true; // Uh oh...
             }
 
             if (keyboard.IsKeyDown(Keys.Space))
-                this._bullets.Add(new(null, this._player._pos,
-                    new(50.0f * MathF.Sin(_player._angle), -50.0f * MathF.Cos(_player._angle)), 100, 0));
+            {
+                this._bullets.Add(new(this, null, this._player.Pos,
+                    new(50.0f * MathF.Sin(this._player.Angle), -50.0f * MathF.Cos(this._player.Angle)), 100, 0));
+            }
 
             // Update asteroids
             for (int i = 0; i < this._asteroids.Count; i++)
             {
-                // VELOCITY changes POSITION (with respect to time)
-                this._asteroids[i]._pos += this._asteroids[i]._dPos * elapsedTime;
-                this._asteroids[i]._angle += 0.5f * elapsedTime; // Add swanky rotation :)
-
-                // Asteroid coordinates are kept in game space (toroidal mapping)
-                PixelRenderer.Wrap(this._asteroids[i]._pos);
+                this._asteroids[i].Angle += 0.5f * elapsedTime; // Add swanky rotation :)
+                this._asteroids[i].Update(elapsedTime);
             }
 
             List<SpaceObject> newAsteroids = new();
@@ -132,38 +118,54 @@ namespace AsteroidsV2._0
             // Update Bullets
             for (int i = 0; i < this._bullets.Count; i++)
             {
-                this._bullets[i]._pos += this._bullets[i]._dPos * elapsedTime;
-                this._bullets[i]._pos = PixelRenderer.Wrap(this._bullets[i]._pos);
-                this._bullets[i]._angle -= 1.0f * elapsedTime;
+                this._bullets[i].Angle -= 1.0f * elapsedTime;
+                this._bullets[i].Update(elapsedTime);
 
                 // Check collision with asteroids
                 for (int j = 0; j < this._asteroids.Count; j++)
                 {
                     //if (IsPointInsideRectangle(a.x, a.y, a.x + a.nSize, a.y + a.nSize, b.x, b.y))
-                    if(IsPointInsideCircle(this._asteroids[j]._pos.X, this._asteroids[j]._pos.Y, this._asteroids[j]._size * 2, this._bullets[i]._pos.X, this._bullets[i]._pos.Y))
+                    if (Game1.IsPointInsideCircle(this._asteroids[j].Pos.X, this._asteroids[j].Pos.Y, this._asteroids[j].Size * 2, this._bullets[i].Pos.X, this._bullets[i].Pos.Y))
                     {
                         // Asteroid Hit - Remove bullet
                         // We've already updated the bullets, so force bullet to be offscreen
                         // so it is cleaned up by the removal algorithm.
-                        this._bullets[i]._pos.X = -100;
+                        this._bullets[i].Pos.X = -100;
 
                         // Create child asteroids
-                        if (this._asteroids[j]._size > 4)
+                        if (this._asteroids[j].Size > 1)
                         {
                             Random random = new();
                             float angle1 = (float)random.NextDouble() * 6.283185f;
                             float angle2 = (float)random.NextDouble() * 6.283185f;
 
-                            newAsteroids.Add(new(this._asteroidModel, _asteroids[j]._pos, new(10.0f * MathF.Sin(angle1), 10.0f * MathF.Cos(angle1)), 0.0f, this._asteroids[j]._size >> 1));
-                            newAsteroids.Add(new(this._asteroidModel, _asteroids[j]._pos, new(10.0f * MathF.Sin(angle2), 10.0f * MathF.Cos(angle2)), 0.0f, this._asteroids[j]._size >> 1));
+                            newAsteroids.Add(new(this, this._asteroidModel, this._asteroids[j].Pos, new(10.0f * MathF.Sin(angle1), 10.0f * MathF.Cos(angle1)), 0.0f, this._asteroids[j].Size >> 1));
+                            newAsteroids.Add(new(this, this._asteroidModel, this._asteroids[j].Pos, new(10.0f * MathF.Sin(angle2), 10.0f * MathF.Cos(angle2)), 0.0f, this._asteroids[j].Size >> 1));
                         }
 
                         // Remove asteroid - Same approach as bullets
-                        this._asteroids[j]._pos.X = -100;
-                        _score += 100; // Small score increase for hitting asteroid
+                        this._asteroids[j].Pos.X = -100;
+                        this._score += 100; // Small score increase for hitting asteroid
                     }
                 }
             }
+
+            // Append new asteroids to existing vector
+            for (int i = 0; i < newAsteroids.Count; i++)
+                this._asteroids.Add(newAsteroids[i]);
+
+            // Remove asteroids that have been blown up
+            if (this._asteroids.Count > 0)
+            {
+                this._asteroids.RemoveAll(static o => o.Pos.X < 0);
+            }
+
+            // Remove bullets that have gone off-screen
+            if (_bullets.Count > 0)
+            {
+                this._bullets.RemoveAll(o => o.Pos.X < 1 || o.Pos.Y < 1 || o.Pos.X >= PixelRenderer.RenderWidth - 1 || o.Pos.Y >= PixelRenderer.RenderHeight - 1);
+            }
+
 
             base.Update(gameTime);
         }
@@ -173,19 +175,13 @@ namespace AsteroidsV2._0
             this._pixelRenderer.Clear(Color.Black);
 
             // Draw player
-            this._pixelRenderer.DrawWireFrameModel(this._player._objModel, this._player._pos.X, this._player._pos.Y, this._player._angle, this._player._size, Color.White);
+            this._player.Draw(Color.White, false);
 
             for (int i = 0; i < this._asteroids.Count; i++)
-            {
-                // Draw Asteroids
-                this._pixelRenderer.DrawWireFrameModel(this._asteroidModel, _asteroids[i]._pos.X, _asteroids[i]._pos.Y, _asteroids[i]._angle, _asteroids[i]._size, Color.Yellow);
-            }
+                this._asteroids[i].Draw(Color.Yellow, false);
 
             for (int i = 0; i < this._bullets.Count; i++)
-            {
-                // Draw bullets
-                this._pixelRenderer.DrawPixel(this._bullets[i]._pos, Color.CornflowerBlue);
-            }
+                this._bullets[i].Draw(Color.CornflowerBlue, true);
 
             this._pixelRenderer.DrawPixels();
 

@@ -63,15 +63,15 @@ internal sealed class PixelRenderer
     {
         this._root.Window.Title = "Asteroids but better";
 
-        this._root._graphics.PreferredBackBufferWidth = (int)Width.Half;
-        this._root._graphics.PreferredBackBufferHeight = (int)Height.Half;
-        _root._graphics.ApplyChanges();
+        this._root.Graphics.PreferredBackBufferWidth = (int)Width.Half;
+        this._root.Graphics.PreferredBackBufferHeight = (int)Height.Half;
+        _root.Graphics.ApplyChanges();
 
-        ScaleX = _root._graphics.PreferredBackBufferWidth / (float)PixelRenderer.RenderWidth;
-        ScaleY = _root._graphics.PreferredBackBufferHeight / (float)PixelRenderer.RenderHeight;
+        ScaleX = _root.Graphics.PreferredBackBufferWidth / (float)PixelRenderer.RenderWidth;
+        ScaleY = _root.Graphics.PreferredBackBufferHeight / (float)PixelRenderer.RenderHeight;
         _scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
 
-        _root._graphics.SynchronizeWithVerticalRetrace = false;
+        _root.Graphics.SynchronizeWithVerticalRetrace = false;
         _root.IsFixedTimeStep = false;
 
         this._renderTarget = new(
