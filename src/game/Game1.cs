@@ -93,6 +93,8 @@ namespace AsteroidsV2._0
                 this._player.DPos.Y += -MathF.Cos(this._player.Angle) * 20.0f * elapsedTime;
             }
 
+            this._player.Update(elapsedTime);
+
             // Check ship collision with asteroids
             for (int i = 0; i < this._asteroids.Count; i++)
             {
@@ -166,7 +168,6 @@ namespace AsteroidsV2._0
                 this._bullets.RemoveAll(o => o.Pos.X < 1 || o.Pos.Y < 1 || o.Pos.X >= PixelRenderer.RenderWidth - 1 || o.Pos.Y >= PixelRenderer.RenderHeight - 1);
             }
 
-
             base.Update(gameTime);
         }
 
@@ -174,7 +175,6 @@ namespace AsteroidsV2._0
         {
             this._pixelRenderer.Clear(Color.Black);
 
-            // Draw player
             this._player.Draw(Color.White, false);
 
             for (int i = 0; i < this._asteroids.Count; i++)
