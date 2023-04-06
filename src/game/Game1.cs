@@ -76,9 +76,6 @@ namespace AsteroidsV2._0
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                Console.WriteLine(Renderer.times);
-                Console.WriteLine(frames);
-
                 this.Exit();
             }
 
