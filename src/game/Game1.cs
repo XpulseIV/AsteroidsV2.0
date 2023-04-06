@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -8,7 +10,7 @@ namespace AsteroidsV2._0
     internal sealed class Game1 : Game
     {
         internal readonly GraphicsDeviceManager Graphics;
-        public PixelRenderer _pixelRenderer;
+        public Renderer Renderer;
 
         private readonly List<SpaceObject> _asteroids = new();
         private readonly List<SpaceObject> _bullets = new();
@@ -30,9 +32,8 @@ namespace AsteroidsV2._0
         {
             base.Initialize();
 
-            // Fix render stuff
-            this._pixelRenderer = new(this.GraphicsDevice, this);
-            this._pixelRenderer.SetupWindow();
+            // Do render stuff
+            this.Renderer = new(this.GraphicsDevice, this);
 
             // Actual game logic
             this._shipModel = new()
@@ -55,7 +56,7 @@ namespace AsteroidsV2._0
 
         private void ResetGame()
         {
-            this._player = new(this, this._shipModel, new(PixelRenderer.RenderWidth / 2f, PixelRenderer.RenderHeight / 2f), new(0, 0), 0, 1);
+            this._player = new(this, this._shipModel, new(Renderer.RenderWidth / 2f, Renderer.RenderHeight / 2f), new(0, 0), 0, 1);
 
             this._bullets.Clear();
             this._asteroids.Clear();
@@ -74,7 +75,13 @@ namespace AsteroidsV2._0
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Console.WriteLine(Renderer.times);
+                Console.WriteLine(frames);
+
                 this.Exit();
+            }
+
             KeyboardState keyboard = Keyboard.GetState();
 
             float elapsedTime = gameTime.ElapsedGameTime.Milliseconds / 1000.0f;
@@ -89,8 +96,7 @@ namespace AsteroidsV2._0
             if (keyboard.IsKeyDown(Keys.Up))
             {
                 // ACCELERATION changes VELOCITY (with respect to time)
-                this._player.DPos.X += MathF.Sin(this._player.Angle) * 20.0f * elapsedTime;
-                this._player.DPos.Y += -MathF.Cos(this._player.Angle) * 20.0f * elapsedTime;
+                this._player.DPos += _player.MakeHeadingVector(20.0f * elapsedTime);
             }
 
             this._player.Update(elapsedTime);
@@ -104,8 +110,8 @@ namespace AsteroidsV2._0
 
             if (keyboard.IsKeyDown(Keys.Space))
             {
-                this._bullets.Add(new(this, null, this._player.Pos,
-                    new(50.0f * MathF.Sin(this._player.Angle), -50.0f * MathF.Cos(this._player.Angle)), 100, 0));
+                var bulletHeading = _player.MakeHeadingVector(50.0f);
+                this._bullets.Add(new(this, null, this._player.Pos, bulletHeading, 0, 0));
             }
 
             // Update asteroids
@@ -157,23 +163,17 @@ namespace AsteroidsV2._0
                 this._asteroids.Add(newAsteroids[i]);
 
             // Remove asteroids that have been blown up
-            if (this._asteroids.Count > 0)
-            {
-                this._asteroids.RemoveAll(static o => o.Pos.X < 0);
-            }
+            if (this._asteroids.Count > 0) this._asteroids.RemoveAll(static o => o.Pos.X < 0);
 
             // Remove bullets that have gone off-screen
-            if (_bullets.Count > 0)
-            {
-                this._bullets.RemoveAll(o => o.Pos.X < 1 || o.Pos.Y < 1 || o.Pos.X >= PixelRenderer.RenderWidth - 1 || o.Pos.Y >= PixelRenderer.RenderHeight - 1);
-            }
+            if (this._bullets.Count > 0) this._bullets.RemoveAll(static o => o.Pos.X < 1 || o.Pos.Y < 1 || o.Pos.X >= Renderer.RenderWidth - 1 || o.Pos.Y >= Renderer.RenderHeight - 1);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            this._pixelRenderer.Clear(Color.Black);
+            this.Renderer.Clear(Color.Black);
 
             this._player.Draw(Color.White, false);
 
@@ -183,7 +183,7 @@ namespace AsteroidsV2._0
             for (int i = 0; i < this._bullets.Count; i++)
                 this._bullets[i].Draw(Color.CornflowerBlue, true);
 
-            this._pixelRenderer.DrawPixels();
+            this.Renderer.PixelPass();
 
             base.Draw(gameTime);
         }

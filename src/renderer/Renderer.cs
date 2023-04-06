@@ -5,7 +5,7 @@ using AsteroidsV2._0;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-internal sealed class PixelRenderer
+internal sealed class Renderer
 {
     private GraphicsDevice _graphicsDevice;
     private readonly Texture2D _screenOfPixels;
@@ -46,6 +46,22 @@ internal sealed class PixelRenderer
         SixtyFourth = 17
     }
 
+    public Renderer(GraphicsDevice graphicsDevice, Game1 root)
+    {
+        this._root = root;
+
+        this._graphicsDevice = graphicsDevice;
+
+        this._pixelData = new Color[Renderer.RenderWidth * Renderer.RenderHeight];
+
+        this._screenOfPixels = new(graphicsDevice, Renderer.RenderWidth, Renderer.RenderHeight);
+
+        this.SetupWindow();
+        this.SetupFont();
+
+        this._spriteBatch = new(graphicsDevice);
+    }
+
     private void SetupFont()
     {
         string data = string.Empty;
@@ -81,25 +97,29 @@ internal sealed class PixelRenderer
             {
                 int k = (r & (1 << i)) != 0 ? 255 : 0;
                 this._pixelFont[py * 128 + px] = new(k, k, k, k);
-                if (++py == 48) { px++; py = 0; }
+                if (++py == 48)
+                {
+                    px++;
+                    py = 0;
+                }
             }
         }
     }
 
-    public void SetupWindow()
+    private void SetupWindow()
     {
         this._root.Window.Title = "Asteroids but better";
 
         this._root.Graphics.PreferredBackBufferWidth = (int)Width.Half;
         this._root.Graphics.PreferredBackBufferHeight = (int)Height.Half;
-        _root.Graphics.ApplyChanges();
+        this._root.Graphics.ApplyChanges();
 
-        this._scaleX = _root.Graphics.PreferredBackBufferWidth / (float)PixelRenderer.RenderWidth;
-        this._scaleY = _root.Graphics.PreferredBackBufferHeight / (float)PixelRenderer.RenderHeight;
-        _scale = Matrix.CreateScale(new Vector3(this._scaleX, this._scaleY, 1));
+        this._scaleX = this._root.Graphics.PreferredBackBufferWidth / (float)Renderer.RenderWidth;
+        this._scaleY = this._root.Graphics.PreferredBackBufferHeight / (float)Renderer.RenderHeight;
+        this._scale = Matrix.CreateScale(new Vector3(this._scaleX, this._scaleY, 1));
 
-        _root.Graphics.SynchronizeWithVerticalRetrace = false;
-        _root.IsFixedTimeStep = false;
+        this._root.Graphics.SynchronizeWithVerticalRetrace = true;
+        this._root.IsFixedTimeStep = true;
 
         this._renderTarget = new(
             this._root.GraphicsDevice,
@@ -108,35 +128,6 @@ internal sealed class PixelRenderer
             false,
             this._root.GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
-    }
-
-    public static Vector2 Wrap(Vector2 position)
-    {
-        float x = position.X;
-        float y = position.Y;
-
-        if (x < 0) x = RenderWidth + x % RenderWidth;
-        if (x >= RenderWidth) x %= RenderWidth;
-
-        if (y < 0) y = RenderHeight + y % RenderHeight;
-        if (y >= RenderHeight) y %= RenderHeight;
-
-        return new(x, y);
-    }
-
-    public PixelRenderer(GraphicsDevice graphicsDevice, Game1 root)
-    {
-        this._root = root;
-
-        this._graphicsDevice = graphicsDevice;
-
-        this._pixelData = new Color[PixelRenderer.RenderWidth * PixelRenderer.RenderHeight];
-
-        this._screenOfPixels = new(graphicsDevice, PixelRenderer.RenderWidth, PixelRenderer.RenderHeight);
-
-        this.SetupFont();
-
-        this._spriteBatch = new(graphicsDevice);
     }
 
     public void DrawString(int x, int y, string sText, Color col, int scale)
@@ -167,14 +158,14 @@ internal sealed class PixelRenderer
                             if (this._pixelFont[(j + oy * 8) * 128 + (i + ox * 8)].R > 0)
                                 for (int iss = 0; iss < scale; iss++)
                                     for (int js = 0; js < scale; js++)
-                                        DrawPixel(x + sx + (i * scale) + iss, y + sy + (j * scale) + js, col);
+                                        this.DrawPixel(x + sx + (i * scale) + iss, y + sy + (j * scale) + js, col);
                 }
                 else
                 {
                     for (int i = 0; i < 8; i++)
                         for (int j = 0; j < 8; j++)
                             if (this._pixelFont[(j + oy * 8) * 128 + (i + ox * 8)].R > 0)
-                                DrawPixel(x + sx + i, y + sy + j, col);
+                                this.DrawPixel(x + sx + i, y + sy + j, col);
                 }
                 sx += 8 * scale;
             }
@@ -184,7 +175,7 @@ internal sealed class PixelRenderer
     public void DrawWireFrameModel(List<Vector2> vecModelCoordinates, float x, float y, float r, float s, Color col)
     {
         // Create translated model vector of coordinate pairs
-        List<Vector2> vecTransformedCoordinates = new List<Vector2>();
+        var vecTransformedCoordinates = new List<Vector2>();
         int verts = vecModelCoordinates.Count;
         vecTransformedCoordinates.AddRange(vecModelCoordinates);
 
@@ -198,10 +189,7 @@ internal sealed class PixelRenderer
         world *= translation;
 
 
-        for (int i = 0; i < verts; i++)
-        {
-            vecTransformedCoordinates[i] = Vector2.Transform(vecModelCoordinates[i], world);
-        }
+        for (int i = 0; i < verts; i++) vecTransformedCoordinates[i] = Vector2.Transform(vecModelCoordinates[i], world);
 
 
         // Draw Closed Polygon
@@ -209,7 +197,7 @@ internal sealed class PixelRenderer
         {
             int j = (i + 1);
 
-            DrawLine((int)vecTransformedCoordinates[i % verts].X, (int)vecTransformedCoordinates[i % verts].Y,
+            this.DrawLine((int)vecTransformedCoordinates[i % verts].X, (int)vecTransformedCoordinates[i % verts].Y,
                 (int)vecTransformedCoordinates[j % verts].X, (int)vecTransformedCoordinates[j % verts].Y, col);
         }
     }
@@ -219,24 +207,33 @@ internal sealed class PixelRenderer
         int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
         dx = x2 - x1; dy = y2 - y1;
         dx1 = Math.Abs(dx); dy1 = Math.Abs(dy);
-        px = 2 * dy1 - dx1;	py = 2 * dx1 - dy1;
+        px = 2 * dy1 - dx1; py = 2 * dx1 - dy1;
         if (dy1 <= dx1)
         {
             if (dx >= 0)
-            { x = x1; y = y1; xe = x2; }
+            {
+                x = x1;
+                y = y1;
+                xe = x2;
+            }
             else
-            { x = x2; y = y2; xe = x1;}
+            {
+                x = x2;
+                y = y2;
+                xe = x1;
+            }
 
             this.DrawPixel(x, y, c);
 
-            for (i = 0; x<xe; i++)
+            for (i = 0; x < xe; i++)
             {
                 x = x + 1;
-                if (px<0)
+                if (px < 0)
                     px = px + 2 * dy1;
                 else
                 {
-                    if ((dx<0 && dy<0) || (dx>0 && dy>0)) y = y + 1; else y = y - 1;
+                    if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) y = y + 1;
+                    else y = y - 1;
                     px = px + 2 * (dy1 - dx1);
                 }
 
@@ -246,20 +243,29 @@ internal sealed class PixelRenderer
         else
         {
             if (dy >= 0)
-            { x = x1; y = y1; ye = y2; }
+            {
+                x = x1;
+                y = y1;
+                ye = y2;
+            }
             else
-            { x = x2; y = y2; ye = y1; }
+            {
+                x = x2;
+                y = y2;
+                ye = y1;
+            }
 
             this.DrawPixel(x, y, c);
 
-            for (i = 0; y<ye; i++)
+            for (i = 0; y < ye; i++)
             {
                 y = y + 1;
                 if (py <= 0)
                     py = py + 2 * dx1;
                 else
                 {
-                    if ((dx<0 && dy<0) || (dx>0 && dy>0)) x = x + 1; else x = x - 1;
+                    if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) x = x + 1;
+                    else x = x - 1;
                     py = py + 2 * (dx1 - dy1);
                 }
 
@@ -277,7 +283,7 @@ internal sealed class PixelRenderer
 
     public void DrawPixel(int x, int y, Color color)
     {
-        Vector2 wrapedCoords = PixelRenderer.Wrap(new(x, y));
+        Vector2 wrapedCoords = ExtensionClass.Wrap(new(x, y), Renderer.RenderWidth, Renderer.RenderHeight);
 
         x = (int)wrapedCoords.X;
         y = (int)wrapedCoords.Y;
@@ -288,10 +294,10 @@ internal sealed class PixelRenderer
 
     public void DrawPixel(Vector2 pos, Color color)
     {
-        DrawPixel((int)pos.X, (int)pos.Y, color);
+        this.DrawPixel((int)pos.X, (int)pos.Y, color);
     }
 
-    public void DrawPixels()
+    public void PixelPass()
     {
         this._screenOfPixels.SetData(this._pixelData);
 
@@ -301,16 +307,15 @@ internal sealed class PixelRenderer
         this._spriteBatch.Draw(this._screenOfPixels, Vector2.Zero, Color.White);
         this._spriteBatch.End();
 
-        _root.GraphicsDevice.SetRenderTarget(null);
+        this._root.GraphicsDevice.SetRenderTarget(null);
 
-        _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap,
-            null, null, null, _scale);
+        this._spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap,
+            null, null, null, this._scale);
 
-        _spriteBatch.Draw(
-            _renderTarget,
+        this._spriteBatch.Draw(this._renderTarget,
             new Rectangle(0, 0, this._root.GraphicsDevice.Viewport.Width, this._root.GraphicsDevice.Viewport.Height),
             Color.White);
-        _spriteBatch.End();
+        this._spriteBatch.End();
     }
 
     public void Clear(Color color)

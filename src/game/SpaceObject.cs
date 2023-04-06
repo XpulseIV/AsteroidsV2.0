@@ -24,11 +24,15 @@ namespace AsteroidsV2._0
             this.Size = size;
         }
 
+        public Vector2 MakeHeadingVector(float speed)
+        {
+            return -Vector2.Transform(Vector2.UnitY, Matrix.CreateRotationZ(this.Angle)) * speed;
+        }
+
         public void Update(float elapsedTime)
         {
             this.Pos += this.DPos * elapsedTime;
-
-            this.Pos = PixelRenderer.Wrap(this.Pos);
+            this.Pos = ExtensionClass.Wrap(this.Pos, Renderer.RenderWidth, Renderer.RenderHeight);
         }
 
         public void Draw(Color color, bool singlePixel)
@@ -36,10 +40,10 @@ namespace AsteroidsV2._0
             switch (singlePixel)
             {
                 case true:
-                    this._root._pixelRenderer.DrawPixel(this.Pos, color);
+                    this._root.Renderer.DrawPixel(this.Pos, color);
                     break;
                 case false:
-                    this._root._pixelRenderer.DrawWireFrameModel(this.ObjModel, this.Pos.X, this.Pos.Y, this.Angle, this.Size, color);
+                    this._root.Renderer.DrawWireFrameModel(this.ObjModel, this.Pos.X, this.Pos.Y, this.Angle, this.Size, color);
                     break;
             }
         }
