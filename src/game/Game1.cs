@@ -105,7 +105,7 @@ namespace AsteroidsV2._0
 
             if (keyboard.IsKeyDown(Keys.Space))
             {
-                var bulletHeading = _player.MakeHeadingVector(50.0f);
+                var bulletHeading = _player.MakeHeadingVector(200.0f);
                 _bullets.Add(new(this, null, _player.Pos, bulletHeading, 0, 0));
             }
 
