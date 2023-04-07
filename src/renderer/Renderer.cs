@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
+using System.Runtime.Intrinsics;
 using AsteroidsV2._0;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -51,18 +53,18 @@ internal sealed class Renderer
 
     public Renderer(GraphicsDevice graphicsDevice, Game1 root)
     {
-        this._root = root;
+        _root = root;
 
-        this._graphicsDevice = graphicsDevice;
+        _graphicsDevice = graphicsDevice;
 
-        this._pixelData = new Color[Renderer.RenderWidth * Renderer.RenderHeight];
+        _pixelData = new Color[Renderer.RenderWidth * Renderer.RenderHeight];
 
-        this._screenOfPixels = new(graphicsDevice, Renderer.RenderWidth, Renderer.RenderHeight);
+        _screenOfPixels = new(graphicsDevice, Renderer.RenderWidth, Renderer.RenderHeight);
 
-        this.SetupWindow();
-        this.SetupFont();
+        SetupWindow();
+        SetupFont();
 
-        this._spriteBatch = new(graphicsDevice);
+        _spriteBatch = new(graphicsDevice);
     }
 
     private void SetupFont()
@@ -87,7 +89,7 @@ internal sealed class Renderer
         data += "?P9PL020O`<`N3R0@E4HC7b0@ET<ATB0@@l6C4B0O`H3N7b0?P01L3R000000020";
         */
 
-        this._pixelFont = new Color[177 * 782];
+        _pixelFont = new Color[177 * 782];
         fontThing = _root.Content.Load<Texture2D>("aseprite_font");
         fontThing.GetData(_pixelFont);
 
@@ -106,7 +108,7 @@ internal sealed class Renderer
 
                 Rectangle charBounds = new(x, y, len, 7);
 
-                this._letters.Add(charBounds);
+                _letters.Add(charBounds);
             }
         }
         /*
@@ -135,25 +137,25 @@ internal sealed class Renderer
 
     private void SetupWindow()
     {
-        this._root.Window.Title = "Asteroids but better";
+        _root.Window.Title = "Asteroids but better";
 
-        this._root.Graphics.PreferredBackBufferWidth = (int)Width.Half;
-        this._root.Graphics.PreferredBackBufferHeight = (int)Height.Half;
-        this._root.Graphics.ApplyChanges();
+        _root.Graphics.PreferredBackBufferWidth = (int)Width.Half;
+        _root.Graphics.PreferredBackBufferHeight = (int)Height.Half;
+        _root.Graphics.ApplyChanges();
 
-        this._scaleX = this._root.Graphics.PreferredBackBufferWidth / (float)Renderer.RenderWidth;
-        this._scaleY = this._root.Graphics.PreferredBackBufferHeight / (float)Renderer.RenderHeight;
-        this._scale = Matrix.CreateScale(new Vector3(this._scaleX, this._scaleY, 1));
+        _scaleX = _root.Graphics.PreferredBackBufferWidth / (float)Renderer.RenderWidth;
+        _scaleY = _root.Graphics.PreferredBackBufferHeight / (float)Renderer.RenderHeight;
+        _scale = Matrix.CreateScale(new Vector3(_scaleX, _scaleY, 1));
 
-        this._root.Graphics.SynchronizeWithVerticalRetrace = true;
-        this._root.IsFixedTimeStep = true;
+        _root.Graphics.SynchronizeWithVerticalRetrace = true;
+        _root.IsFixedTimeStep = true;
 
-        this._renderTarget = new(
-            this._root.GraphicsDevice,
-            this._root.GraphicsDevice.PresentationParameters.BackBufferWidth,
-            this._root.GraphicsDevice.PresentationParameters.BackBufferHeight,
+        _renderTarget = new(
+            _root.GraphicsDevice,
+            _root.GraphicsDevice.PresentationParameters.BackBufferWidth,
+            _root.GraphicsDevice.PresentationParameters.BackBufferHeight,
             false,
-            this._root.GraphicsDevice.PresentationParameters.BackBufferFormat,
+            _root.GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
     }
 
@@ -181,7 +183,7 @@ internal sealed class Renderer
                     {
                         int indexInLetters = (c - 32);
 
-                        Rectangle letterBoundingBox = this._letters[indexInLetters];
+                        Rectangle letterBoundingBox = _letters[indexInLetters];
 
                         var charColorArray = new Color[letterBoundingBox.Width * letterBoundingBox.Height];
 
@@ -194,7 +196,7 @@ internal sealed class Renderer
                         {
                             for (int charX = 0; charX < letterBoundingBox.Width; charX++)
                             {
-                                charColorArray[charY * letterBoundingBox.Width + charX] = this._pixelFont[
+                                charColorArray[charY * letterBoundingBox.Width + charX] = _pixelFont[
                                     (letterBoundingBox.Y + charY) * 177 + (letterBoundingBox.X + charX)];
                             }
                         }
@@ -212,7 +214,7 @@ internal sealed class Renderer
                                         {
                                             for (int xss = 0; xss < scale; xss++)
                                             {
-                                                this.DrawPixel(x + sx + (xOffset * scale) + xss,
+                                                DrawPixel(x + sx + (xOffset * scale) + xss,
                                                     y + sy + (yOffset * scale) + yss, col);
                                             }
                                         }
@@ -228,7 +230,7 @@ internal sealed class Renderer
                                 {
                                     if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] == new Color(0, 0, 0, 255))
                                     {
-                                        this.DrawPixel(x + sx + xOffset, y + sy + yOffset, col);
+                                        DrawPixel(x + sx + xOffset, y + sy + yOffset, col);
                                     }
                                 }
                             }
@@ -272,7 +274,7 @@ internal sealed class Renderer
         {
             int j = (i + 1);
 
-            this.DrawLine((int)vecTransformedCoordinates[i % verts].X, (int)vecTransformedCoordinates[i % verts].Y,
+            DrawLine((int)vecTransformedCoordinates[i % verts].X, (int)vecTransformedCoordinates[i % verts].Y,
                 (int)vecTransformedCoordinates[j % verts].X, (int)vecTransformedCoordinates[j % verts].Y, col);
         }
     }
@@ -302,7 +304,7 @@ internal sealed class Renderer
                 xe = x1;
             }
 
-            this.DrawPixel(x, y, c);
+            DrawPixel(x, y, c);
 
             for (i = 0; x < xe; i++)
             {
@@ -317,7 +319,7 @@ internal sealed class Renderer
                     px = px + 2 * (dy1 - dx1);
                 }
 
-                this.DrawPixel(x, y, c);
+                DrawPixel(x, y, c);
             }
         }
         else
@@ -335,7 +337,7 @@ internal sealed class Renderer
                 ye = y1;
             }
 
-            this.DrawPixel(x, y, c);
+            DrawPixel(x, y, c);
 
             for (i = 0; y < ye; i++)
             {
@@ -350,16 +352,16 @@ internal sealed class Renderer
                     py = py + 2 * (dx1 - dy1);
                 }
 
-                this.DrawPixel(x, y, c);
+                DrawPixel(x, y, c);
             }
         }
     }
 
     public void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, Color c)
     {
-        this.DrawLine(x1, y1, x2, y2, c);
-        this.DrawLine(x2, y2, x3, y3, c);
-        this.DrawLine(x3, y3, x1, y1, c);
+        DrawLine(x1, y1, x2, y2, c);
+        DrawLine(x2, y2, x3, y3, c);
+        DrawLine(x3, y3, x1, y1, c);
     }
 
     public void DrawPixel(int x, int y, Color color)
@@ -369,38 +371,74 @@ internal sealed class Renderer
         x = (int)wrapedCoords.X;
         y = (int)wrapedCoords.Y;
 
-        int index = y * this._screenOfPixels.Width + x;
-        this._pixelData[index] = color;
+        int index = y * _screenOfPixels.Width + x;
+        _pixelData[index] = color;
     }
 
     public void DrawPixel(Vector2 pos, Color color)
     {
-        this.DrawPixel((int)pos.X, (int)pos.Y, color);
+        DrawPixel((int)pos.X, (int)pos.Y, color);
     }
 
     public void PixelPass()
     {
-        this._screenOfPixels.SetData(this._pixelData);
+        _screenOfPixels.SetData(_pixelData);
 
-        this._root.GraphicsDevice.SetRenderTarget(this._renderTarget);
+        _root.GraphicsDevice.SetRenderTarget(_renderTarget);
 
-        this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap);
-        this._spriteBatch.Draw(this._screenOfPixels, Vector2.Zero, Color.White);
-        this._spriteBatch.End();
+        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap);
+        _spriteBatch.Draw(_screenOfPixels, Vector2.Zero, Color.White);
+        _spriteBatch.End();
 
-        this._root.GraphicsDevice.SetRenderTarget(null);
+        _root.GraphicsDevice.SetRenderTarget(null);
 
-        this._spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap,
-            null, null, null, this._scale);
+        _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap,
+            null, null, null, _scale);
 
-        this._spriteBatch.Draw(this._renderTarget,
-            new Rectangle(0, 0, this._root.GraphicsDevice.Viewport.Width, this._root.GraphicsDevice.Viewport.Height),
+        _spriteBatch.Draw(_renderTarget,
+            new Rectangle(0, 0, _root.GraphicsDevice.Viewport.Width, _root.GraphicsDevice.Viewport.Height),
             Color.White);
-        this._spriteBatch.End();
+        _spriteBatch.End();
     }
 
     public void Clear(Color color)
     {
-        for (int i = 0; i < this._pixelData.Length; i++) this._pixelData[i] = color;
+        for (int i = 0; i < _pixelData.Length; i++) _pixelData[i] = color;
+    }
+
+    public void ClearUnsafe(Color color)
+    {
+        unsafe
+        {
+            fixed (Color* pixels = &_pixelData[0])
+            {
+                for (int i = 0; i < _pixelData.Length; i++)
+                {
+                    *(pixels + i) = color;
+                }
+            }
+        }
+    }
+
+    public void ClearSIMD(Color color)
+    {
+        if (Avx2.IsSupported && _pixelData.Length >= 8)
+        {
+            var colorVector = Vector256.Create(color.PackedValue);
+            int numVectors = _pixelData.Length / 8;
+
+            unsafe
+            {
+                fixed (Color* pixels = &_pixelData[0])
+                {
+                    var pixelVectors = (Vector256<uint>*)pixels;
+
+                    for (int i = 0; i < numVectors; i++)
+                    {
+                        Avx2.Store((uint*)(pixelVectors + i), colorVector);
+                    }
+                }
+            }
+        }
     }
 }

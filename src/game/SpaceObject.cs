@@ -15,24 +15,24 @@ namespace AsteroidsV2._0
 
         public SpaceObject(Game1 rooty, List<Vector2> model, Vector2 pos, Vector2 deltaPos, float angle, int size)
         {
-            this._root = rooty;
+            _root = rooty;
 
-            this.ObjModel = model;
-            this.Pos = pos;
-            this.DPos = deltaPos;
-            this.Angle = angle;
-            this.Size = size;
+            ObjModel = model;
+            Pos = pos;
+            DPos = deltaPos;
+            Angle = angle;
+            Size = size;
         }
 
         public Vector2 MakeHeadingVector(float speed)
         {
-            return -Vector2.Transform(Vector2.UnitY, Matrix.CreateRotationZ(this.Angle)) * speed;
+            return -Vector2.Transform(Vector2.UnitY, Matrix.CreateRotationZ(Angle)) * speed;
         }
 
         public void Update(float elapsedTime)
         {
-            this.Pos += this.DPos * elapsedTime;
-            this.Pos = ExtensionClass.Wrap(this.Pos, Renderer.RenderWidth, Renderer.RenderHeight);
+            Pos += DPos * elapsedTime;
+            Pos = ExtensionClass.Wrap(Pos, Renderer.RenderWidth, Renderer.RenderHeight);
         }
 
         public void Draw(Color color, bool singlePixel)
@@ -40,10 +40,10 @@ namespace AsteroidsV2._0
             switch (singlePixel)
             {
                 case true:
-                    this._root.Renderer.DrawPixel(this.Pos, color);
+                    _root.Renderer.DrawPixel(Pos, color);
                     break;
                 case false:
-                    this._root.Renderer.DrawWireFrameModel(this.ObjModel, this.Pos.X, this.Pos.Y, this.Angle, this.Size, color);
+                    _root.Renderer.DrawWireFrameModel(ObjModel, Pos.X, Pos.Y, Angle, Size, color);
                     break;
             }
         }
