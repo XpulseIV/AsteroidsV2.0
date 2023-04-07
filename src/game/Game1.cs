@@ -181,6 +181,8 @@ namespace AsteroidsV2._0
             //     this._bullets[i].Draw(Color.CornflowerBlue, true);
 
             this.Renderer.DrawString(0, 0, "Gello, World!", Color.Aqua, 1);
+            this.Renderer.DrawString(0, 7, "Gello, World!", Color.Aqua, 2);
+            this.Renderer.DrawString(0, 21, "Gello, World!", Color.Aqua, 3);
 
             this.Renderer.PixelPass();
 

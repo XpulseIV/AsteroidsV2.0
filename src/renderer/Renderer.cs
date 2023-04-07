@@ -178,61 +178,71 @@ internal sealed class Renderer
                     break;
 
                 default:
-                {
-                    int indexInLetters = (c - 32);
-
-                    Rectangle letterBoundingBox = this._letters[indexInLetters];
-
-                    var charColorArray = new Color[letterBoundingBox.Width * letterBoundingBox.Height];
-
-                    for (int charY = 0; charY < letterBoundingBox.Height; charY++)
                     {
-                        for (int charX = 0; charX < letterBoundingBox.Width; charX++)
+                        int indexInLetters = (c - 32);
+
+                        Rectangle letterBoundingBox = this._letters[indexInLetters];
+
+                        var charColorArray = new Color[letterBoundingBox.Width * letterBoundingBox.Height];
+
+                        if (c == '!')
                         {
-                            charColorArray[charY * letterBoundingBox.Width + charX] = this._pixelFont[
-                                (letterBoundingBox.Y + charY) * 177 + (letterBoundingBox.X + charX)];
+                            sy -= 1;
                         }
-                    }
 
-                    if (scale > 1)
-                    {
-                        for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                        for (int charY = 0; charY < letterBoundingBox.Height; charY++)
                         {
-                            for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                            for (int charX = 0; charX < letterBoundingBox.Width; charX++)
                             {
-                                if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] ==
-                                    new Color(0, 0, 0, 255))
+                                charColorArray[charY * letterBoundingBox.Width + charX] = this._pixelFont[
+                                    (letterBoundingBox.Y + charY) * 177 + (letterBoundingBox.X + charX)];
+                            }
+                        }
+
+                        if (scale > 1)
+                        {
+                            for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                            {
+                                for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
                                 {
-                                    for (int yss = 0; yss < scale; yss++)
+                                    if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] ==
+                                        new Color(0, 0, 0, 255))
                                     {
-                                        for (int xss = 0; xss < scale; xss++)
+                                        for (int yss = 0; yss < scale; yss++)
                                         {
-                                            this.DrawPixel(x + sx + (xOffset * scale) + xss,
-                                                y + sy + (yOffset * scale) + yss, col);
+                                            for (int xss = 0; xss < scale; xss++)
+                                            {
+                                                this.DrawPixel(x + sx + (xOffset * scale) + xss,
+                                                    y + sy + (yOffset * scale) + yss, col);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                        else
                         {
-                            for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                            for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
                             {
-                                if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] == new Color(0, 0, 0, 255))
+                                for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
                                 {
-                                    this.DrawPixel(x + sx + xOffset, y + sy + yOffset, col);
+                                    if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] == new Color(0, 0, 0, 255))
+                                    {
+                                        this.DrawPixel(x + sx + xOffset, y + sy + yOffset, col);
+                                    }
                                 }
                             }
                         }
+
+                        if (c == '!')
+                        {
+                            sy += 1;
+                        }
+
+                        sx += letterBoundingBox.Width * scale;
+
+                        break;
                     }
-
-                    sx += letterBoundingBox.Width * scale;
-
-                    break;
-                }
             }
         }
     }
