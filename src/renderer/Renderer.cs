@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using AsteroidsV2._0;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,6 +24,8 @@ internal sealed class Renderer
     private float _scaleY;
 
     private Color[] _pixelFont;
+    private Texture2D fontThing;
+    private readonly List<Rectangle> _letters = new();
 
     private enum Width
     {
@@ -64,6 +67,7 @@ internal sealed class Renderer
 
     private void SetupFont()
     {
+        /*
         string data = string.Empty;
         data += "?Q`0001oOch0o01o@F40o0<AGD4090LAGD<090@A7ch0?00O7Q`0600>00000000";
         data += "O000000nOT0063Qo4d8>?7a14Gno94AA4gno94AaOT0>o3`oO400o7QN00000400";
@@ -81,9 +85,31 @@ internal sealed class Renderer
         data += "Ob@8@@00Ob@8@Ga13R@8Mga172@8?PAo3R@827QoOb@820@0O`0007`0000007P0";
         data += "O`000P08Od400g`<3V=P0G`673IP0`@3>1`00P@6O`P00g`<O`000GP800000000";
         data += "?P9PL020O`<`N3R0@E4HC7b0@ET<ATB0@@l6C4B0O`H3N7b0?P01L3R000000020";
+        */
 
-        this._pixelFont = new Color[128 * 48];
+        this._pixelFont = new Color[177 * 782];
+        fontThing = _root.Content.Load<Texture2D>("aseprite_font");
+        fontThing.GetData(_pixelFont);
 
+        for (int y = 1; y < 782; y += 11)
+        {
+            for (int x = 1; x < 176; x += 11)
+            {
+                int index = (y * 177) + x;
+                int len = 0;
+
+                while (_pixelFont[index] != new Color(255, 255, 255, 255))
+                {
+                    len++;
+                    index++;
+                }
+
+                Rectangle charBounds = new(x, y, len, 7);
+
+                this._letters.Add(charBounds);
+            }
+        }
+        /*
         int px = 0, py = 0;
         for (int b = 0; b < 1024; b += 4)
         {
@@ -104,6 +130,7 @@ internal sealed class Renderer
                 }
             }
         }
+        */
     }
 
     private void SetupWindow()
@@ -137,37 +164,50 @@ internal sealed class Renderer
 
         foreach (char c in sText)
         {
-            if (c == '\n')
+            switch (c)
             {
-                sx = 0;
-                sy += 8 * scale;
-            }
-            else if (c == '\t')
-            {
-                sx += 8 * 4 * scale;
-            }
-            else
-            {
-                int ox = (c - 32) % 16;
-                int oy = (c - 32) / 16;
+                case '\n':
+                    sx = 0;
+                    sy += 7 * scale;
 
-                if (scale > 1)
+                    break;
+
+                case '\t':
+                    sx += 8 * 4 * scale;
+
+                    break;
+
+                default:
                 {
-                    for (int i = 0; i < 8; i++)
-                        for (int j = 0; j < 8; j++)
-                            if (this._pixelFont[(j + oy * 8) * 128 + (i + ox * 8)].R > 0)
-                                for (int iss = 0; iss < scale; iss++)
-                                    for (int js = 0; js < scale; js++)
-                                        this.DrawPixel(x + sx + (i * scale) + iss, y + sy + (j * scale) + js, col);
+                    int indexInLetters = (c - 32);
+
+                    Rectangle letterBoundingBox = this._letters[indexInLetters];
+
+                    var charColorArray = new Color[letterBoundingBox.Width * letterBoundingBox.Height];
+
+                    for (int charY = 0; charY < letterBoundingBox.Height; charY++)
+                    {
+                        for (int charX = 0; charX < letterBoundingBox.Width; charX++)
+                        {
+                            charColorArray[charY * letterBoundingBox.Width + charX] = this._pixelFont[
+                                (letterBoundingBox.Y + charY) * 177 + (letterBoundingBox.X + charX)];
+                        }
+                    }
+
+                    if (scale > 1)
+                    {
+                    }
+                    else
+                    {
+                        for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                            for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                                if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] == new Color(0, 0, 0, 255))
+                                    this.DrawPixel(x + sx + xOffset, y + sy + yOffset, col);
+                    }
+                    sx += letterBoundingBox.Width * scale;
+
+                    break;
                 }
-                else
-                {
-                    for (int i = 0; i < 8; i++)
-                        for (int j = 0; j < 8; j++)
-                            if (this._pixelFont[(j + oy * 8) * 128 + (i + ox * 8)].R > 0)
-                                this.DrawPixel(x + sx + i, y + sy + j, col);
-                }
-                sx += 8 * scale;
             }
         }
     }

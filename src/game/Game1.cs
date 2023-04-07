@@ -170,15 +170,17 @@ namespace AsteroidsV2._0
 
         protected override void Draw(GameTime gameTime)
         {
-            this.Renderer.Clear(Color.Black);
+            this.Renderer.Clear(new(28, 23, 41));
 
-            this._player.Draw(Color.White, false);
+            // this._player.Draw(Color.White, false);
+            //
+            // for (int i = 0; i < this._asteroids.Count; i++)
+            //     this._asteroids[i].Draw(Color.Yellow, false);
+            //
+            // for (int i = 0; i < this._bullets.Count; i++)
+            //     this._bullets[i].Draw(Color.CornflowerBlue, true);
 
-            for (int i = 0; i < this._asteroids.Count; i++)
-                this._asteroids[i].Draw(Color.Yellow, false);
-
-            for (int i = 0; i < this._bullets.Count; i++)
-                this._bullets[i].Draw(Color.CornflowerBlue, true);
+            Renderer.DrawString(0, 0, "asdagsuifguiysgfudshjdfgiusdyf", Color.Aqua, 1);
 
             this.Renderer.PixelPass();
 
