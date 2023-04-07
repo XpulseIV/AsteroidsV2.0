@@ -180,7 +180,7 @@ namespace AsteroidsV2._0
             // for (int i = 0; i < this._bullets.Count; i++)
             //     this._bullets[i].Draw(Color.CornflowerBlue, true);
 
-            Renderer.DrawString(0, 0, "asdagsuifguiysgfudshjdfgiusdyf", Color.Aqua, 1);
+            this.Renderer.DrawString(0, 0, "Gello, World!", Color.Aqua, 1);
 
             this.Renderer.PixelPass();
 

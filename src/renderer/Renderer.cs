@@ -196,14 +196,39 @@ internal sealed class Renderer
 
                     if (scale > 1)
                     {
+                        for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                        {
+                            for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                            {
+                                if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] ==
+                                    new Color(0, 0, 0, 255))
+                                {
+                                    for (int yss = 0; yss < scale; yss++)
+                                    {
+                                        for (int xss = 0; xss < scale; xss++)
+                                        {
+                                            this.DrawPixel(x + sx + (xOffset * scale) + xss,
+                                                y + sy + (yOffset * scale) + yss, col);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     else
                     {
                         for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                        {
                             for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                            {
                                 if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] == new Color(0, 0, 0, 255))
+                                {
                                     this.DrawPixel(x + sx + xOffset, y + sy + yOffset, col);
+                                }
+                            }
+                        }
                     }
+
                     sx += letterBoundingBox.Width * scale;
 
                     break;
@@ -245,9 +270,13 @@ internal sealed class Renderer
     public void DrawLine(int x1, int y1, int x2, int y2, Color c)
     {
         int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
-        dx = x2 - x1; dy = y2 - y1;
-        dx1 = Math.Abs(dx); dy1 = Math.Abs(dy);
-        px = 2 * dy1 - dx1; py = 2 * dx1 - dy1;
+        dx = x2 - x1;
+        dy = y2 - y1;
+        dx1 = Math.Abs(dx);
+        dy1 = Math.Abs(dy);
+        px = 2 * dy1 - dx1;
+        py = 2 * dx1 - dy1;
+
         if (dy1 <= dx1)
         {
             if (dx >= 0)
@@ -268,6 +297,7 @@ internal sealed class Renderer
             for (i = 0; x < xe; i++)
             {
                 x = x + 1;
+
                 if (px < 0)
                     px = px + 2 * dy1;
                 else
@@ -300,6 +330,7 @@ internal sealed class Renderer
             for (i = 0; y < ye; i++)
             {
                 y = y + 1;
+
                 if (py <= 0)
                     py = py + 2 * dx1;
                 else
