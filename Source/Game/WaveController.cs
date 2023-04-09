@@ -4,6 +4,7 @@ using System.Linq;
 using Asteroids2.Source.Entity.Entities;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 
 namespace Asteroids2.Source.Game;
@@ -73,17 +74,12 @@ public class WaveController
         m_waveTextTimer = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
-    public List<DrawTask> GetDrawTasks()
+    public void Draw()
     {
-        List<DrawTask> drawTasks = new List<DrawTask>();
-
-        if (!m_drawWaveText) return drawTasks;
+        if (!m_drawWaveText) return;
 
         string text = $"Wave: {m_currentWave}";
-        drawTasks.AddRange
-            (text.CreateDrawTasks(new Vector2(10, 10), Color.Gray, LayerDepth.HUD));
-
-        return drawTasks;
+        GameState.Root.TextRenderer.Draw(text, new Vector2(10, 10), Palette.GetColor(Palette.Colors.Blue6), 2);
     }
 
     public void OnUpdate(UpdateEventArgs e)

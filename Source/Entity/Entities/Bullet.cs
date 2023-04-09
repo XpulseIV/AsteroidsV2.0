@@ -4,6 +4,7 @@ using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Utilities;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +18,7 @@ public class Bullet : Entity
 
         model = new List<Vector2>() { new Vector2(0, 0) };
 
-        Color = Color.Gray;
+        Color = Palette.GetColor(Palette.Colors.Grey9);
 
         Collider = new Collider
         (

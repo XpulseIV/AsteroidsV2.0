@@ -5,6 +5,7 @@ using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Utilities;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 
 namespace Asteroids2.Source.Entity.Entities;
@@ -32,7 +33,7 @@ public class Asteroid : Entity
 
         model = new List<Vector2>();
 
-        Color = Color.OrangeRed;
+        Color = Palette.GetColor(Palette.Colors.Red6);
 
         for (int i = 0; i < verts; i++)
         {

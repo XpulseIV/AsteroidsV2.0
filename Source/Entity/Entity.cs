@@ -4,6 +4,8 @@ using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
+using Asteroids2.Source.Utilities;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -47,13 +49,11 @@ public class Entity
         GameState = gameState;
         Position = position;
         m_timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-        CreateHealthBarTexture();
     }
 
     public virtual void OnUpdate(UpdateEventArgs e)
     {
-        Collider.SetPosition(Position - new Vector2(Collider.Radius));
+        Collider.SetPosition(Position);
 
         if (IsActor && (HP <= 0))
         {
@@ -130,13 +130,6 @@ public class Entity
         Destroy();
     }
 
-    private void CreateHealthBarTexture()
-    {
-        m_healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
-        Color[] data = { Color.Gray };
-        m_healthBarTexture.SetData(data);
-    }
-
     private void DrawHealthBar()
     {
         const int width = 20;
@@ -147,8 +140,12 @@ public class Entity
         int x = (int)Position.X - width / 2;
         int y = (int)Position.Y - 20;
 
-        GameState.Root.PixelRenderer.DrawRect(x - 1, y - 1, width + 2, height + 2, new Color(0x000000)); // Outline
-        GameState.Root.PixelRenderer.DrawFilledRect(x, y, width, height, new Color(216, 95, 40)); // Empty
-        GameState.Root.PixelRenderer.DrawFilledRect(x, y, filled, height, new Color(204, 209, 80)); // Filled
+        var outlineColor = Palette.GetColor(Palette.Colors.Black);
+        var emptyColor = Palette.GetColor(Palette.Colors.Red6);
+        var filledColor = Palette.GetColor(Palette.Colors.Green7);
+        
+        GameState.Root.PixelRenderer.DrawRect(x - 1, y - 1, width + 2, height + 2, outlineColor); // Outline
+        GameState.Root.PixelRenderer.DrawFilledRect(x, y, width, height, emptyColor); // Empty
+        GameState.Root.PixelRenderer.DrawFilledRect(x, y, filled, height, filledColor); // Filled
     }
 }

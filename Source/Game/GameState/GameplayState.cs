@@ -3,6 +3,7 @@ using Asteroids2.Source.Entity;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Entity.Entities;
 using Asteroids2.Source.Graphics;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -30,32 +31,16 @@ public class GameplayState : GameState
     public override void Draw()
     {
         Root.PixelRenderer.ClearSimd(BackgroundColor);
-        
+
         foreach (Entity.Entity entity in Entities) entity.Draw();
 
-        //drawTasks.AddRange(WaveController.GetDrawTasks());
-        
+        WaveController.Draw();
 
         if (!Root.ShowDebug) return;
 
         foreach (Collider collider in CollisionSystem.Colliders)
         {
-            Texture2D circle = Root.PixelRenderer.CreateCircle
-                (collider.Radius, new Color(Color.Gray, 0.15F));
-/*
-            drawTasks.Add
-            (
-                new DrawTask
-                (
-                    circle,
-                    collider.Position,
-                    0,
-                    LayerDepth.Debug,
-                    new List<IDrawTaskEffect>(),
-                    Palette.GetColor(Palette.Colors.Grey9),
-                    Vector2.Zero
-                )
-            );*/
+            Root.PixelRenderer.DrawCircle((int)collider.Position.X, (int)collider.Position.Y, collider.Radius, Palette.GetColor(Palette.Colors.Green8), 0xff);
         }
     }
 

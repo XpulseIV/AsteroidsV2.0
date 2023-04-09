@@ -37,32 +37,42 @@ public class PixelRenderer
         return m_screenTexture;
     }
 
-    public Texture2D CreateCircle(int radius, Color color)
+    public void DrawCircle(int x, int y, int radius, Color c, byte mask)
     {
-        int outerRadius = radius * 2 + 2; // So circle doesn't go out of bounds
-        Texture2D texture = new Texture2D(m_root.GraphicsDevice, outerRadius, outerRadius);
-
-        Color[] data = new Color[outerRadius * outerRadius];
-
-        // Colour the entire texture transparent first.
-        for (int i = 0; i < data.Length; i++)
-            data[i] = Color.Transparent;
-
-        // Work out the minimum step necessary using trigonometry + sine approximation.
-        double angleStep = 1f / radius;
-
-        for (double angle = 0; angle < (Math.PI * 2); angle += angleStep)
+        if (radius > 0)
         {
-            // Use the parametric definition of a circle: http://en.wikipedia.org/wiki/Circle#Cartesian_coordinates
-            int x = (int)Math.Round(radius + radius * Math.Cos(angle));
-            int y = (int)Math.Round(radius + radius * Math.Sin(angle));
+            int x0 = 0;
+            int y0 = radius;
+            int d = 3 - 2 * radius;
 
-            data[y * outerRadius + x + 1] = color;
+            while (y0 >= x0) // only formulate 1/8 of circle
+            {
+                // Draw even octants
+                if ((mask & 0x01) != 0) DrawPixel(x + x0, y - y0, c); // Q6 - upper right right
+                if ((mask & 0x04) != 0) DrawPixel(x + y0, y + x0, c); // Q4 - lower lower right
+                if ((mask & 0x10) != 0) DrawPixel(x - x0, y + y0, c); // Q2 - lower left left
+                if ((mask & 0x40) != 0) DrawPixel(x - y0, y - x0, c); // Q0 - upper upper left
+
+                if ((x0 != 0) && (x0 != y0))
+                {
+                    if ((mask & 0x02) != 0) DrawPixel(x + y0, y - x0, c); // Q7 - upper upper right
+                    if ((mask & 0x08) != 0) DrawPixel(x + x0, y + y0, c); // Q5 - lower right right
+                    if ((mask & 0x20) != 0) DrawPixel(x - y0, y + x0, c); // Q3 - lower lower left
+                    if ((mask & 0x80) != 0) DrawPixel(x - x0, y - y0, c); // Q1 - upper left left
+                }
+
+                if (d < 0)
+                {
+                    d += 4 * x0++ + 6;
+                }
+                else
+                {
+                    d += 4 * (x0++ - y0--) + 10;
+                }
+            }
         }
-
-        texture.SetData(data);
-
-        return texture;
+        else
+            DrawPixel(x, y, c);
     }
 
     public void DrawPixel(int x, int y, Color color)

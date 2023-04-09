@@ -34,7 +34,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             (float)Math.Round(Game1.TargetWidth / 2D),
             (float)Math.Round(Game1.TargetHeight / 2D)
         );
-
+/*
         DrawTask gameOverText = new DrawTask
             (m_gameOverText, textPosition, 0, LayerDepth.HUD, new List<IDrawTaskEffect>());
 
@@ -49,6 +49,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         );
 
         //return new List<DrawTask> { pixelScreen, gameOverText, restartPrompt };
+        */
     }
 
     public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)

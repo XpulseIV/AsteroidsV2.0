@@ -5,93 +5,136 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Asteroids2.Source.Graphics;
 
-public static class TextRenderer
+public class TextRenderer
 {
-    private static Texture2D m_font;
+    private Game1 m_root;
 
-    private static Dictionary<char, int> m_dict;
+    private Color[] m_pixelFont;
+    private Texture2D m_fontThing;
+    private readonly List<Rectangle> m_letters = new List<Rectangle>();
 
-    public static void Init()
+    public void Init(Game1 root)
     {
-        m_font = AssetManager.Load<Texture2D>("font");
-        m_dict = new Dictionary<char, int>
+        m_root = root;
+
+        m_pixelFont = new Color[177 * 782];
+        m_fontThing = m_root.Content.Load<Texture2D>("aseprite_font");
+        m_fontThing.GetData(m_pixelFont);
+
+        for (int y = 1; y < 782; y += 11)
         {
-            { 'A', 0 },
-            { 'B', 1 },
-            { 'C', 2 },
-            { 'D', 3 },
-            { 'E', 4 },
-            { 'F', 5 },
-            { 'G', 6 },
-            { 'H', 7 },
-            { 'I', 8 },
-            { 'J', 9 },
-            { 'K', 10 },
-            { 'L', 11 },
-            { 'M', 12 },
-            { 'N', 13 },
-            { 'O', 14 },
-            { 'P', 15 },
-            { 'Q', 16 },
-            { 'R', 17 },
-            { 'S', 18 },
-            { 'T', 19 },
-            { 'U', 20 },
-            { 'V', 21 },
-            { 'W', 22 },
-            { 'X', 23 },
-            { 'Y', 24 },
-            { 'Z', 25 },
-            { '0', 26 },
-            { '1', 27 },
-            { '2', 28 },
-            { '3', 29 },
-            { '4', 30 },
-            { '5', 31 },
-            { '6', 32 },
-            { '7', 33 },
-            { '8', 34 },
-            { '9', 35 },
-            { ':', 36 },
-            { ';', 37 },
-            { '.', 38 },
-            { ',', 39 },
-            { ' ', 40 }
-        };
+            for (int x = 1; x < 177; x += 11)
+            {
+                int index = (y * 177) + x;
+                int len = 0;
+
+                while (m_pixelFont[index] != new Color(255, 255, 255, 255))
+                {
+                    len++;
+                    index++;
+                }
+
+                Rectangle charBounds = new Rectangle(x, y, len, 7);
+
+                m_letters.Add(charBounds);
+            }
+        }
     }
 
-    public static List<DrawTask> CreateDrawTasks(
-        this string input,
+    public void Draw(string input,
         Vector2 position,
-        Color color,
-        LayerDepth layerDepth)
+        Color color, int scale)
     {
-        string text = input.ToUpper();
-        List<DrawTask> drawTasks = new List<DrawTask>();
+        DrawString((int)position.X, (int)position.Y, input, color, scale);
+    }
 
-        for (int i = 0; i < text.Length; i++)
+    public void DrawString(int x, int y, string sText, Color col, int scale)
+    {
+        int sx = 0;
+        int sy = 0;
+
+        foreach (char c in sText)
         {
-            int x = m_dict[text[i]] % 6;
-            int y = m_dict[text[i]] / 6;
+            switch (c)
+            {
+            case '\n':
+                sx = 0;
+                sy += 7 * scale;
 
-            Rectangle source = new Rectangle(x * 10, y * 10, 10, 10);
+                break;
 
-            drawTasks.Add
-            (
-                new DrawTask
-                (
-                    m_font,
-                    source,
-                    new Vector2(position.X + i * 10, position.Y),
-                    0,
-                    layerDepth,
-                    new List<IDrawTaskEffect>(),
-                    color,
-                    Vector2.Zero
-                )
-            );
+            case '\t':
+                sx += 8 * 4 * scale;
+
+                break;
+
+            default:
+            {
+                int indexInLetters = (c - 32);
+
+                Rectangle letterBoundingBox = m_letters[indexInLetters];
+
+                var charColorArray = new Color[letterBoundingBox.Width * letterBoundingBox.Height];
+
+                if (c == '!')
+                {
+                    sy -= 1;
+                }
+
+                for (int charY = 0; charY < letterBoundingBox.Height; charY++)
+                {
+                    for (int charX = 0; charX < letterBoundingBox.Width; charX++)
+                    {
+                        charColorArray[charY * letterBoundingBox.Width + charX] = m_pixelFont[
+                            (letterBoundingBox.Y + charY) * 177 + (letterBoundingBox.X + charX)];
+                    }
+                }
+
+                if (scale > 1)
+                {
+                    for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                    {
+                        for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                        {
+                            if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] ==
+                                new Color(0, 0, 0, 255))
+                            {
+                                for (int yss = 0; yss < scale; yss++)
+                                {
+                                    for (int xss = 0; xss < scale; xss++)
+                                    {
+                                        m_root.PixelRenderer.DrawPixel(x + sx + (xOffset * scale) + xss,
+                                            y + sy + (yOffset * scale) + yss, col);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                    {
+                        for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                        {
+                            if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] == new Color(0, 0, 0, 255))
+                            {
+                                m_root.PixelRenderer.DrawPixel(x + sx + xOffset, y + sy + yOffset, col);
+                            }
+                        }
+                    }
+                }
+
+                if (c == '!')
+                {
+                    sy += 1;
+                }
+
+                sx += letterBoundingBox.Width * scale;
+
+                break;
+            }
+            }
         }
-
-        return drawTasks;
     }
 }

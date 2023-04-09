@@ -2,6 +2,7 @@
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -22,6 +23,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // render
     public SpriteBatch SpriteBatch;
     private RenderTarget2D m_renderTarget;
+    public TextRenderer TextRenderer;
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -75,8 +77,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         );
 
         AssetManager.Init(this);
-        TextRenderer.Init();
+        TextRenderer = new TextRenderer();
+        TextRenderer.Init(this);
         InputEventSource.Init();
+        Palette.Init();
 
         GameStateMachine = new GameStateMachine(new GameplayState(this));
     }
@@ -124,8 +128,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
             string frameRate = Math.Round(m_frameRate).ToString();
             string renderTime = m_renderTime.ToString();
 
-            //frameRate.Draw(Vector2.Zero, Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
-            //renderTime.Draw(new Vector2(0, 9), Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
+            TextRenderer.DrawString(0, 0, frameRate, Palette.GetColor(Palette.Colors.Yellow9), 1);
+            TextRenderer.DrawString(0, 7, renderTime, Palette.GetColor(Palette.Colors.Yellow9), 1);
         }
 
         Texture2D finalScreen = PixelRenderer.GetPixelScreen();

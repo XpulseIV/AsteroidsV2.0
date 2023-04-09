@@ -21,6 +21,15 @@ public static class ExtensionMethods
         if (y < 0) y = RenderHeight + y % RenderHeight;
         if (y >= RenderHeight) y %= RenderHeight;
 
-        return new(x, y);
+        return new Vector2(x, y);
+    }
+
+    public static Color toColor(this int ic)
+    {
+        byte r = (byte)(ic >> 24);
+        byte g = (byte)(ic >> 16);
+        byte b = (byte)(ic >> 8);
+
+        return new Color((float)r, g, b, 255);
     }
 }

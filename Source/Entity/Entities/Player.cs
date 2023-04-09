@@ -7,6 +7,7 @@ using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
 using Asteroids2.Source.Utilities;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -38,7 +39,7 @@ public class Player : Entity, IInputEventListener
             new Vector2(2.5f, 2.5f)
         };
 
-        Color = Color.Aqua;
+        Color = Palette.GetColor(Palette.Colors.Blue8);
 
         StartListening();
 
