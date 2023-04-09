@@ -27,7 +27,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static readonly Effect ColorEffect = AssetManager.Load<Effect>("Color");
 
     // display
-    private static readonly Color BackgroundColor = new Color(28, 23, 41);
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix m_scale;
