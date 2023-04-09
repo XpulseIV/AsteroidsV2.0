@@ -1,7 +1,7 @@
 ﻿using System;
-using static AstralAssault.InputEventSource;
+using static Asteroids2.Source.Input.InputEventSource;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Input;
 
 public class MouseButtonEventArgs : EventArgs
 {

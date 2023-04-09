@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Graphics;
 
 public struct DrawTask
 {

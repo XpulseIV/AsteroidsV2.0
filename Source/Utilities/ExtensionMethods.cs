@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Utilities;
 
 public static class ExtensionMethods
 {

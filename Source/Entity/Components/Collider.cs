@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Entity.Components;
 
 public class Collider
 {

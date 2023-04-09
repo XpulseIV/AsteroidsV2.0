@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
+using Asteroids2.Source.Entity;
+using Asteroids2.Source.Entity.Components;
+using Asteroids2.Source.Entity.Entities;
+using Asteroids2.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Game.GameState;
 
 public class GameplayState : GameState
 {
@@ -10,7 +14,7 @@ public class GameplayState : GameState
 
     private static Color BackgroundColor = new Color(28, 23, 41);
 
-    public readonly List<Entity> Entities;
+    public readonly List<Entity.Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new CollisionSystem();
     public WaveController WaveController;
 
@@ -23,7 +27,7 @@ public class GameplayState : GameState
     {
         PixelRenderer = new PixelRenderer(root, Game1.TargetWidth, Game1.TargetHeight);
 
-        Entities = new List<Entity>();
+        Entities = new List<Entity.Entity>();
         WaveController = new WaveController(this, Root);
     }
 
@@ -33,7 +37,7 @@ public class GameplayState : GameState
 
         PixelRenderer.ClearSimd(BackgroundColor);
 
-        foreach (Entity entity in Entities) drawTasks.AddRange(entity.GetDrawTasks());
+        foreach (Entity.Entity entity in Entities) drawTasks.AddRange(entity.GetDrawTasks());
 
         drawTasks.AddRange(WaveController.GetDrawTasks());
 

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Asteroids2.Source.Game.GameState;
+using Asteroids2.Source.Graphics;
+using Asteroids2.Source.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Game;
 
-public class Game1 : Game
+public class Game1 : Microsoft.Xna.Framework.Game
 {
     private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Asteroids2.Source.Graphics;
+using Asteroids2.Source.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Game.GameState;
 
 public class GameOverState : GameState, IKeyboardPressedEventListener
 {

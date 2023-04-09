@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace Vector2Extensions;
+namespace Asteroids2.Source.VectorExtensions;
 
 internal static class Vector2Ext
 {

@@ -1,6 +1,6 @@
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Graphics;
 
 public struct ColorEffect : IDrawTaskEffect
 {

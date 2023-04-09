@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Game;
 
 public static class AssetManager
 {

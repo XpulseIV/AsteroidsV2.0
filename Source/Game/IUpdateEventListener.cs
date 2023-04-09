@@ -1,4 +1,4 @@
-﻿namespace AstralAssault;
+﻿namespace Asteroids2.Source.Game;
 
 public interface IUpdateEventListener
 {

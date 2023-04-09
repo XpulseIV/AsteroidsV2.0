@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Input;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Input;
 
 public class KeyboardEventArgs : EventArgs
 {

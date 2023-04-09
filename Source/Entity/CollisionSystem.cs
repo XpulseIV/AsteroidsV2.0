@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Asteroids2.Source.Entity.Components;
+using Asteroids2.Source.Game;
 using Microsoft.Xna.Framework;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Entity;
 
 public class CollisionSystem
 {

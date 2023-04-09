@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Asteroids2.Source.Graphics;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Game.GameState;
 
 public abstract class GameState : IUpdateEventListener
 {

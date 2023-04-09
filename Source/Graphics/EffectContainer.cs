@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Graphics;
 
 public sealed class EffectContainer
 {

@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Asteroids2.Source.Entity.Components;
+using Asteroids2.Source.Game;
+using Asteroids2.Source.Game.GameState;
+using Asteroids2.Source.Graphics;
+using Asteroids2.Source.Input;
+using Asteroids2.Source.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Entity.Entities;
 
 public class Player : Entity, IInputEventListener
 {

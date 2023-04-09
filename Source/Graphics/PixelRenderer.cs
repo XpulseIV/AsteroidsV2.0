@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
+using Asteroids2.Source.Game;
+using Asteroids2.Source.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Graphics;
 
 public class PixelRenderer
 {

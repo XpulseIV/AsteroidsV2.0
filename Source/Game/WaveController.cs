@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Asteroids2.Source.Entity.Entities;
+using Asteroids2.Source.Game.GameState;
+using Asteroids2.Source.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Game;
 
 public class WaveController
 {

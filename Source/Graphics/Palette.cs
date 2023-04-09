@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Graphics;
 
 public static class Palette
 {

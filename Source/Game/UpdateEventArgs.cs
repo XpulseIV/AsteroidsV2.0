@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Game;
 
 public class UpdateEventArgs : EventArgs
 {

@@ -1,6 +1,6 @@
-namespace AstralAssault.Source.CollisionStuff;
-
 using Microsoft.Xna.Framework;
+
+namespace Asteroids2.Source.CollisionStuff;
 
 /// <summary>
 /// This is a simple circle class... it has a center and a radius, that's about it

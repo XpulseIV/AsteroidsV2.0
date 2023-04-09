@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Asteroids2.Source.Game;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Graphics;
 
 public static class TextRenderer
 {

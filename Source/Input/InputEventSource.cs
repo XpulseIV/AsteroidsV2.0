@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Asteroids2.Source.Game;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace AstralAssault;
+namespace Asteroids2.Source.Input;
 
 public static class InputEventSource
 {
