@@ -10,8 +10,6 @@ namespace Asteroids2.Source.Game.GameState;
 
 public class GameplayState : GameState
 {
-    public readonly PixelRenderer PixelRenderer;
-
     private static Color BackgroundColor = new Color(28, 23, 41);
 
     public readonly List<Entity.Entity> Entities;
@@ -25,39 +23,26 @@ public class GameplayState : GameState
 
     public GameplayState(Game1 root) : base(root)
     {
-        PixelRenderer = new PixelRenderer(root, Game1.TargetWidth, Game1.TargetHeight);
-
         Entities = new List<Entity.Entity>();
         WaveController = new WaveController(this, Root);
     }
 
-    public override List<DrawTask> GetDrawTasks()
+    public override void Draw()
     {
-        List<DrawTask> drawTasks = new List<DrawTask>();
+        Root.PixelRenderer.ClearSimd(BackgroundColor);
+        
+        foreach (Entity.Entity entity in Entities) entity.Draw();
 
-        PixelRenderer.ClearSimd(BackgroundColor);
+        //drawTasks.AddRange(WaveController.GetDrawTasks());
+        
 
-        foreach (Entity.Entity entity in Entities) drawTasks.AddRange(entity.GetDrawTasks());
-
-        drawTasks.AddRange(WaveController.GetDrawTasks());
-
-
-        Texture2D texture = PixelRenderer.GetPixelScreen();
-        DrawTask pixelScreen = new DrawTask
-        (
-            texture, new Vector2(0, 0), 0, LayerDepth.Background, new List<IDrawTaskEffect>(),
-            Palette.GetColor(Palette.Colors.Grey9), new Vector2(0, 0)
-        );
-
-        drawTasks.Add(pixelScreen);
-
-        if (!Root.ShowDebug) return drawTasks;
+        if (!Root.ShowDebug) return;
 
         foreach (Collider collider in CollisionSystem.Colliders)
         {
-            Texture2D circle = PixelRenderer.CreateCircle
-                (collider.Radius, new Color(Palette.GetColor(Palette.Colors.Grey9), 0.15F));
-
+            Texture2D circle = Root.PixelRenderer.CreateCircle
+                (collider.Radius, new Color(Color.Gray, 0.15F));
+/*
             drawTasks.Add
             (
                 new DrawTask
@@ -70,10 +55,8 @@ public class GameplayState : GameState
                     Palette.GetColor(Palette.Colors.Grey9),
                     Vector2.Zero
                 )
-            );
+            );*/
         }
-
-        return drawTasks;
     }
 
     public override void Enter()

@@ -1,4 +1,5 @@
-﻿using Asteroids2.Source.Entity.Components;
+﻿using System.Collections.Generic;
+using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
@@ -14,11 +15,9 @@ public class Bullet : Entity
     {
         Velocity = -Vector2.UnitY.RotateVector(rotation) * speed;
 
-        Texture2D spriteSheet = new Texture2D(GameState.Root.GraphicsDevice, 2, 2);
+        model = new List<Vector2>() { new Vector2(0, 0) };
 
-        Color[] data = new Color[2 * 2];
-        for (int i = 0; i < data.Length; ++i) data[i] = Palette.GetColor(Palette.Colors.Grey9);
-        spriteSheet.SetData(data);
+        Color = Color.Gray;
 
         Collider = new Collider
         (
@@ -31,7 +30,7 @@ public class Bullet : Entity
 
         ContactDamage = 5;
         IsFriendly = true;
-        IsBullet = true;
+        size = 1;
     }
 
     public override void OnCollision(Collider other)

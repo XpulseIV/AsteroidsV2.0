@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Asteroids2.Source.Game;
 
 public class Game1 : Microsoft.Xna.Framework.Game
 {
+    public PixelRenderer PixelRenderer;
+
     private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 
     private enum Width { Full = 1920, Half = 960, Quarter = 480 }
@@ -23,8 +22,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // render
     public SpriteBatch SpriteBatch;
     private RenderTarget2D m_renderTarget;
-    private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("Highlight");
-    private static readonly Effect ColorEffect = AssetManager.Load<Effect>("Color");
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -63,6 +60,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void Initialize()
     {
+        base.Initialize();
+
+        PixelRenderer = new PixelRenderer(this, TargetWidth, TargetHeight);
+
         m_renderTarget = new RenderTarget2D
         (
             GraphicsDevice,
@@ -76,11 +77,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         AssetManager.Init(this);
         TextRenderer.Init();
         InputEventSource.Init();
-        Palette.Init();
 
         GameStateMachine = new GameStateMachine(new GameplayState(this));
-
-        base.Initialize();
     }
 
     protected override void LoadContent()
@@ -109,7 +107,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // draw sprites to render target
         GraphicsDevice.SetRenderTarget(m_renderTarget);
 
-        List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(static dt => (int)dt.LayerDepth).ToList();
+        GameStateMachine.Draw();
 
         if (ShowDebug)
         {
@@ -126,48 +124,15 @@ public class Game1 : Microsoft.Xna.Framework.Game
             string frameRate = Math.Round(m_frameRate).ToString();
             string renderTime = m_renderTime.ToString();
 
-            List<DrawTask> frameRateTask =
-                frameRate.CreateDrawTasks(Vector2.Zero, Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
-            List<DrawTask> renderTimeTask =
-                renderTime.CreateDrawTasks
-                    (new Vector2(0, 9), Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
-
-            drawTasks.AddRange(frameRateTask);
-            drawTasks.AddRange(renderTimeTask);
+            //frameRate.Draw(Vector2.Zero, Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
+            //renderTime.Draw(new Vector2(0, 9), Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
         }
+
+        Texture2D finalScreen = PixelRenderer.GetPixelScreen();
 
         SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
 
-        foreach (DrawTask drawTask in drawTasks)
-        {
-            foreach (IDrawTaskEffect effect in drawTask.EffectContainer.Effects)
-            {
-                switch (effect)
-                {
-                case ColorEffect colorEffect:
-                    ColorEffect.CurrentTechnique.Passes[1].Apply();
-                    ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
-                    ColorEffect.CurrentTechnique.Passes[0].Apply();
-
-                    break;
-                }
-            }
-
-            SpriteBatch.Draw
-            (
-                drawTask.Texture,
-                drawTask.Destination,
-                drawTask.Source,
-                Color.White,
-                drawTask.Rotation,
-                drawTask.Origin,
-                SpriteEffects.None,
-                0
-            );
-
-            HighlightEffect.CurrentTechnique.Passes[1].Apply();
-            ColorEffect.CurrentTechnique.Passes[1].Apply();
-        }
+        SpriteBatch.Draw(finalScreen, new Rectangle(0, 0, TargetWidth, TargetHeight), Color.White);
 
         SpriteBatch.End();
 

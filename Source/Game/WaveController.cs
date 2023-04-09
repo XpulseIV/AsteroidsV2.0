@@ -81,7 +81,7 @@ public class WaveController
 
         string text = $"Wave: {m_currentWave}";
         drawTasks.AddRange
-            (text.CreateDrawTasks(new Vector2(10, 10), Palette.GetColor(Palette.Colors.Grey9), LayerDepth.HUD));
+            (text.CreateDrawTasks(new Vector2(10, 10), Color.Gray, LayerDepth.HUD));
 
         return drawTasks;
     }

@@ -20,14 +20,18 @@ public class Entity
     protected readonly GameplayState GameState;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
     protected bool IsActor = false;
-    protected bool IsBullet = false;
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
 
+    protected int size;
+    protected Color Color;
+
     public bool IsFriendly;
 
     private readonly long m_timeSpawned;
+
+    public List<Vector2> model;
 
     public long TimeSinceSpawned
     {
@@ -108,17 +112,11 @@ public class Entity
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
     }
 
-    public virtual List<DrawTask> GetDrawTasks()
+    public virtual void Draw()
     {
-        List<DrawTask> drawTasks = new List<DrawTask>();
+        GameState.Root.PixelRenderer.DrawWireFrameModel(model, Position.X, Position.Y, Rotation, size, Color);
 
-        if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
-        else if (IsBullet)
-        {
-            GameState.PixelRenderer.DrawPixel(Position, Palette.GetColor(Palette.Colors.Grey9));
-        }
-
-        return drawTasks;
+        if (IsActor) DrawHealthBar();
     }
 
     public virtual void Destroy()
@@ -135,11 +133,11 @@ public class Entity
     private void CreateHealthBarTexture()
     {
         m_healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
-        Color[] data = { Palette.GetColor(Palette.Colors.Grey9) };
+        Color[] data = { Color.Gray };
         m_healthBarTexture.SetData(data);
     }
 
-    private List<DrawTask> CreateHealthBarDrawTasks()
+    private void DrawHealthBar()
     {
         const int width = 20;
         const int height = 3;
@@ -149,34 +147,8 @@ public class Entity
         int x = (int)Position.X - width / 2;
         int y = (int)Position.Y - 20;
 
-        Rectangle outline = new Rectangle(x - 1, y - 1, width + 2, height + 2);
-        Rectangle emptyHealthBar = new Rectangle(x, y, width, height);
-        Rectangle fullHealthBar = new Rectangle(x, y, filled, height);
-
-        Vector4 outlineColor = Palette.GetColorVector(Palette.Colors.Black);
-        Vector4 emptyColor = Palette.GetColorVector(Palette.Colors.Red6);
-        Vector4 fullColor = Palette.GetColorVector(Palette.Colors.Green7);
-
-        Rectangle source = new Rectangle(0, 0, 1, 1);
-
-        DrawTask background = new DrawTask
-        (
-            m_healthBarTexture, source, outline, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(outlineColor) }, Palette.GetColor(Palette.Colors.Black)
-        );
-
-        DrawTask empty = new DrawTask
-        (
-            m_healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(emptyColor) }, Palette.GetColor(Palette.Colors.Red9)
-        );
-
-        DrawTask full = new DrawTask
-        (
-            m_healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, Palette.GetColor(Palette.Colors.Green9)
-        );
-
-        return new List<DrawTask> { background, empty, full };
+        GameState.Root.PixelRenderer.DrawRect(x - 1, y - 1, width + 2, height + 2, new Color(0x000000)); // Outline
+        GameState.Root.PixelRenderer.DrawFilledRect(x, y, width, height, new Color(216, 95, 40)); // Empty
+        GameState.Root.PixelRenderer.DrawFilledRect(x, y, filled, height, new Color(204, 209, 80)); // Filled
     }
 }

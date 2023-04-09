@@ -9,8 +9,6 @@ namespace Asteroids2.Source.Game.GameState;
 
 public class GameOverState : GameState, IKeyboardPressedEventListener
 {
-    public readonly PixelRenderer PixelRenderer;
-
     private static Color BackgroundColor = new Color(28, 23, 41);
 
     private Texture2D m_gameOverText;
@@ -18,14 +16,12 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
     public GameOverState(Game1 root) : base(root)
     {
-        PixelRenderer = new PixelRenderer(root, Game1.TargetWidth, Game1.TargetHeight);
-
         InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
     }
 
-    public override List<DrawTask> GetDrawTasks()
+    public override void Draw()
     {
-        PixelRenderer.ClearSimd(BackgroundColor);
+        Root.PixelRenderer.ClearSimd(BackgroundColor);
 
         Vector2 textPosition = new Vector2
         (
@@ -45,14 +41,14 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         DrawTask restartPrompt = new DrawTask
             (m_restartPrompt, promptPosition, 0, LayerDepth.HUD, new List<IDrawTaskEffect>());
 
-        Texture2D texture = PixelRenderer.GetPixelScreen();
+        Texture2D texture = Root.PixelRenderer.GetPixelScreen();
         DrawTask pixelScreen = new DrawTask
         (
             texture, new Vector2(0, 0), 0, LayerDepth.Background, new List<IDrawTaskEffect>(),
-            Palette.GetColor(Palette.Colors.Grey9), new Vector2(0, 0)
+            Color.Gray, new Vector2(0, 0)
         );
 
-        return new List<DrawTask> { pixelScreen, gameOverText, restartPrompt };
+        //return new List<DrawTask> { pixelScreen, gameOverText, restartPrompt };
     }
 
     public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)

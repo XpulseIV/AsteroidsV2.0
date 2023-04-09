@@ -17,8 +17,6 @@ public class Asteroid : Entity
 
     public enum Sizes { Smallest, Small, Medium }
 
-    private List<Vector2> m_astModel = new List<Vector2>();
-
     public Asteroid(
         GameplayState gameState,
         Vector2 position,
@@ -27,12 +25,19 @@ public class Asteroid : Entity
         : base(gameState, position)
     {
         m_size = size;
+
+        this.size = ((int)m_size + 1) * 4;
+
         const int verts = 20;
+
+        model = new List<Vector2>();
+
+        Color = Color.OrangeRed;
 
         for (int i = 0; i < verts; i++)
         {
             float noise = (float)(new Random().NextDouble()) * 0.4f + 0.8f;
-            m_astModel.Add
+            model.Add
             (
                 new Vector2
                 (
@@ -130,16 +135,5 @@ public class Asteroid : Entity
         {
             Rotation = -MathF.PI;
         }
-    }
-
-    public override List<DrawTask> GetDrawTasks()
-    {
-        List<DrawTask> drawTasks = new List<DrawTask>();
-
-        drawTasks.AddRange(base.GetDrawTasks());
-
-        GameState.PixelRenderer.DrawWireFrameModel(m_astModel, Position.X, Position.Y, Rotation, ((int)m_size + 1) * 4, Color.OrangeRed);
-
-        return drawTasks;
     }
 }

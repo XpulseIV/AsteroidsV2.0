@@ -25,17 +25,20 @@ public class Player : Entity, IInputEventListener
     private const float BulletSpeed = 250;
     private const int ShootSpeed = 150;
 
-    private static readonly List<Vector2> ShipModel = new List<Vector2>
-    {
-        new Vector2(0.0f, -5.0f),
-        new Vector2(-2.5f, 2.5f),
-        new Vector2(2.5f, 2.5f)
-    };
-
     public Player(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
         Position = position;
         Rotation = 0;
+        size = 1;
+
+        model = new List<Vector2>
+        {
+            new Vector2(0.0f, -5.0f),
+            new Vector2(-2.5f, 2.5f),
+            new Vector2(2.5f, 2.5f)
+        };
+
+        Color = Color.Aqua;
 
         StartListening();
 
@@ -54,17 +57,6 @@ public class Player : Entity, IInputEventListener
         MaxHP = 50;
         HP = MaxHP;
         IsFriendly = true;
-    }
-
-    public override List<DrawTask> GetDrawTasks()
-    {
-        List<DrawTask> drawTasks = new List<DrawTask>();
-
-        drawTasks.AddRange(base.GetDrawTasks());
-
-        GameState.PixelRenderer.DrawWireFrameModel(ShipModel, Position.X, Position.Y, Rotation, 1, Color.Aqua);
-
-        return drawTasks;
     }
 
     private void StartListening()

@@ -81,6 +81,22 @@ public class PixelRenderer
         DrawPixel((int)pos.X, (int)pos.Y, color);
     }
 
+    public void DrawRect(int x, int y, int w, int h, Color c)
+    {
+        DrawLine(x, y, x + w, y, c);
+        DrawLine(x + w, y, x + w, y + h, c);
+        DrawLine(x + w, y + h, x, y + h, c);
+        DrawLine(x, y + h, x, y, c);
+    }
+
+    public void DrawFilledRect(int x, int y, int w, int h, Color c)
+    {
+        for (int yOffset = 0; yOffset <= h; yOffset++)
+        {
+            DrawLine(x + w, y + h - yOffset, x, y + h - yOffset, c);
+        }
+    }
+
     public void DrawLine(int x1, int y1, int x2, int y2, Color c)
     {
         int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
