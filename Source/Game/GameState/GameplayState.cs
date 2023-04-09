@@ -40,7 +40,11 @@ public class GameplayState : GameState
 
         foreach (Collider collider in CollisionSystem.Colliders)
         {
-            Root.PixelRenderer.DrawCircle((int)collider.Position.X, (int)collider.Position.Y, collider.Radius, Palette.GetColor(Palette.Colors.Green8), 0xff);
+            Root.PixelRenderer.DrawCircle
+            (
+                (int)collider.Position.X, (int)collider.Position.Y, collider.Radius,
+                Palette.GetColor(Palette.Colors.Green8), 0xff
+            );
         }
     }
 

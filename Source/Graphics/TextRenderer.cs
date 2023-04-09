@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Asteroids2.Source.Game;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -103,8 +104,11 @@ public class TextRenderer
                                 {
                                     for (int xss = 0; xss < scale; xss++)
                                     {
-                                        m_root.PixelRenderer.DrawPixel(x + sx + (xOffset * scale) + xss,
-                                            y + sy + (yOffset * scale) + yss, col);
+                                        m_root.PixelRenderer.DrawPixel
+                                        (
+                                            x + sx + (xOffset * scale) + xss,
+                                            y + sy + (yOffset * scale) + yss, col
+                                        );
                                     }
                                 }
                             }
@@ -136,5 +140,10 @@ public class TextRenderer
             }
             }
         }
+    }
+
+    public int StringLen(string input)
+    {
+        return input.Sum(c => m_letters[(c - 32)].Width);
     }
 }

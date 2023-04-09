@@ -140,10 +140,10 @@ public class Entity
         int x = (int)Position.X - width / 2;
         int y = (int)Position.Y - 20;
 
-        var outlineColor = Palette.GetColor(Palette.Colors.Black);
-        var emptyColor = Palette.GetColor(Palette.Colors.Red6);
-        var filledColor = Palette.GetColor(Palette.Colors.Green7);
-        
+        Color outlineColor = Palette.GetColor(Palette.Colors.Black);
+        Color emptyColor = Palette.GetColor(Palette.Colors.Red6);
+        Color filledColor = Palette.GetColor(Palette.Colors.Green7);
+
         GameState.Root.PixelRenderer.DrawRect(x - 1, y - 1, width + 2, height + 2, outlineColor); // Outline
         GameState.Root.PixelRenderer.DrawFilledRect(x, y, width, height, emptyColor); // Empty
         GameState.Root.PixelRenderer.DrawFilledRect(x, y, filled, height, filledColor); // Filled

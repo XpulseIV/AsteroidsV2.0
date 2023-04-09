@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,9 +11,6 @@ namespace Asteroids2.Source.Game.GameState;
 public class GameOverState : GameState, IKeyboardPressedEventListener
 {
     private static Color BackgroundColor = new Color(28, 23, 41);
-
-    private Texture2D m_gameOverText;
-    private Texture2D m_restartPrompt;
 
     public GameOverState(Game1 root) : base(root)
     {
@@ -25,31 +23,24 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
         Vector2 textPosition = new Vector2
         (
-            (float)Math.Round(Game1.TargetWidth / 2D),
-            (float)Math.Round(Game1.TargetHeight / 3D)
+            MathF.Round(Game1.TargetWidth / 2f),
+            MathF.Round(Game1.TargetHeight / 3f)
         );
 
         Vector2 promptPosition = new Vector2
         (
-            (float)Math.Round(Game1.TargetWidth / 2D),
-            (float)Math.Round(Game1.TargetHeight / 2D)
-        );
-/*
-        DrawTask gameOverText = new DrawTask
-            (m_gameOverText, textPosition, 0, LayerDepth.HUD, new List<IDrawTaskEffect>());
-
-        DrawTask restartPrompt = new DrawTask
-            (m_restartPrompt, promptPosition, 0, LayerDepth.HUD, new List<IDrawTaskEffect>());
-
-        Texture2D texture = Root.PixelRenderer.GetPixelScreen();
-        DrawTask pixelScreen = new DrawTask
-        (
-            texture, new Vector2(0, 0), 0, LayerDepth.Background, new List<IDrawTaskEffect>(),
-            Color.Gray, new Vector2(0, 0)
+            (float)Math.Round(Game1.TargetWidth / 2f),
+            (float)Math.Round(Game1.TargetHeight / 2f)
         );
 
-        //return new List<DrawTask> { pixelScreen, gameOverText, restartPrompt };
-        */
+        const string gameOverString = "Game Over";
+        const string restartString = "Press any key to continue!";
+
+        int gOsLenght = Root.TextRenderer.StringLen(gameOverString);
+        int rsLenght = Root.TextRenderer.StringLen(restartString);
+
+        Root.TextRenderer.DrawString((int)textPosition.X - gOsLenght, (int)textPosition.Y, gameOverString, Palette.GetColor(Palette.Colors.Grey8), 2);
+        Root.TextRenderer.DrawString((int)promptPosition.X - rsLenght, (int)promptPosition.Y, restartString, Palette.GetColor(Palette.Colors.Grey9), 2);
     }
 
     public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
@@ -57,11 +48,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         Root.GameStateMachine.ChangeState(new GameplayState(Root));
     }
 
-    public override void Enter()
-    {
-        m_gameOverText = AssetManager.Load<Texture2D>("GameOver");
-        m_restartPrompt = AssetManager.Load<Texture2D>("Restart");
-    }
+    public override void Enter() { }
 
     public override void Exit()
     {

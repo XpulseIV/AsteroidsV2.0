@@ -11,10 +11,11 @@ public class CollisionSystem
     public List<Collider> Colliders { get; } = new List<Collider>();
     private List<Tuple<Collider, Collider>> m_lastCollisions = new List<Tuple<Collider, Collider>>();
 
-    private readonly Func<float, float, float, float, float, float, bool> m_doCirclesOverlap = static (x1, y1, r1, x2, y2, r2) =>
-    {
-        return MathF.Abs((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) <= (r1 + r2) * (r1 + r2);
-    };
+    private readonly Func<float, float, float, float, float, float, bool> m_doCirclesOverlap
+        = static (x1, y1, r1, x2, y2, r2) =>
+        {
+            return MathF.Abs((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) <= (r1 + r2) * (r1 + r2);
+        };
 
     public void OnUpdate(UpdateEventArgs e)
     {
@@ -29,7 +30,8 @@ public class CollisionSystem
 
                 if (!m_doCirclesOverlap
                     (
-                        Colliders[i].Position.X, Colliders[i].Position.Y, Colliders[i].Radius, Colliders[j].Position.X, Colliders[j].Position.Y,
+                        Colliders[i].Position.X, Colliders[i].Position.Y, Colliders[i].Radius, Colliders[j].Position.X,
+                        Colliders[j].Position.Y,
                         Colliders[j].Radius
                     )) continue;
 
