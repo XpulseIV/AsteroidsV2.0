@@ -99,11 +99,15 @@ public class PixelRenderer
         DrawLine(x, y + h, x, y, c);
     }
 
-    public void DrawFilledRect(int x, int y, int w, int h, Color c)
+    public void FillRect(int x, int y, int w, int h, Color c)
     {
-        for (int yOffset = 0; yOffset <= h; yOffset++)
+        int x2 = x + w;
+        int y2 = y + h;
+
+        for (int i = x; i < x2; i++)
         {
-            DrawLine(x + w, y + h - yOffset, x, y + h - yOffset, c);
+            for (int j = y; j < y2; j++)
+                DrawPixel(i, j, c);
         }
     }
 
@@ -190,7 +194,6 @@ public class PixelRenderer
         // Create translated model vector of coordinate pairs
         List<Vector2> vecTransformedCoordinates = new List<Vector2>();
         int verts = vecModelCoordinates.Count;
-        vecTransformedCoordinates.AddRange(vecModelCoordinates);
 
         Matrix translation = Matrix.CreateTranslation(x, y, 0);
         Matrix rotation = Matrix.CreateRotationZ(r);
@@ -204,7 +207,7 @@ public class PixelRenderer
 
         for (int i = 0; i < verts; i++)
         {
-            vecTransformedCoordinates[i] = Vector2.Transform(vecModelCoordinates[i], world);
+            vecTransformedCoordinates.Add(Vector2.Transform(vecModelCoordinates[i], world));
         }
 
 

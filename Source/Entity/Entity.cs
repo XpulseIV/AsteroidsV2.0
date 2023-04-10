@@ -1,54 +1,50 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
-using Asteroids2.Source.Graphics;
-using Asteroids2.Source.Utilities;
 using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
-using Vector4 = Microsoft.Xna.Framework.Vector4;
+#endregion
 
 namespace Asteroids2.Source.Entity;
 
 public class Entity
 {
-    public Vector2 Position;
-    public Vector2 Velocity;
-    protected float Rotation;
-    protected Collider Collider;
     protected readonly GameplayState GameState;
-    protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
-    protected bool IsActor = false;
-    protected float MaxHP;
-    protected float HP;
-    protected float ContactDamage;
 
-    protected int size;
+    private readonly long m_timeSpawned;
+    protected Collider Collider;
     protected Color Color;
+    protected float ContactDamage;
+    protected float HP;
+    protected bool IsActor = false;
 
     public bool IsFriendly;
 
-    private readonly long m_timeSpawned;
+    private Texture2D m_healthBarTexture;
+    protected float MaxHP;
 
     public List<Vector2> model;
+    protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
+    public Vector2 Position;
+    protected float Rotation;
 
-    public long TimeSinceSpawned
-    {
-        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
-    }
-
-    private Texture2D m_healthBarTexture;
-
-    protected enum OutOfBounds { DoNothing, Wrap, Destroy }
+    protected int size;
+    public Vector2 Velocity;
 
     protected Entity(GameplayState gameState, Vector2 position)
     {
         GameState = gameState;
         Position = position;
         m_timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+    }
+
+    public long TimeSinceSpawned
+    {
+        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
     }
 
     public virtual void OnUpdate(UpdateEventArgs e)
@@ -144,8 +140,10 @@ public class Entity
         Color emptyColor = Palette.GetColor(Palette.Colors.Red6);
         Color filledColor = Palette.GetColor(Palette.Colors.Green7);
 
-        GameState.Root.PixelRenderer.DrawRect(x - 1, y - 1, width + 2, height + 2, outlineColor); // Outline
-        GameState.Root.PixelRenderer.DrawFilledRect(x, y, width, height, emptyColor); // Empty
-        GameState.Root.PixelRenderer.DrawFilledRect(x, y, filled, height, filledColor); // Filled
+        GameState.Root.PixelRenderer.DrawRect(x - 1, y - 1, width + 1, height + 1, outlineColor); // Outline
+        GameState.Root.PixelRenderer.FillRect(x, y, width, height, emptyColor); // Empty
+        GameState.Root.PixelRenderer.FillRect(x, y, filled, height, filledColor); // Filled
     }
+
+    protected enum OutOfBounds { DoNothing, Wrap, Destroy }
 }

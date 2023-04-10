@@ -14,17 +14,16 @@ public class CollisionSystem
     private readonly Func<float, float, float, float, float, float, bool> m_doCirclesOverlap
         = static (x1, y1, r1, x2, y2, r2) =>
         {
-            return MathF.Abs((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) <= (r1 + r2) * (r1 + r2);
+            return MathF.Abs((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) <= ((r1 + r2) * (r1 + r2));
         };
 
     public void OnUpdate(UpdateEventArgs e)
     {
         List<Tuple<Collider, Collider>> currentCollisions = new List<Tuple<Collider, Collider>>();
 
-        // Static collisions, i.e. overlap
         for (int i = 0; i < (Colliders.Count - 1); i++)
         {
-            for (int j = i + 1; j < Colliders.Count; j++)
+            for (int j = 0; j < Colliders.Count; j++)
             {
                 if (Colliders[i] == Colliders[j]) continue;
 
@@ -47,18 +46,15 @@ public class CollisionSystem
                     float fDistance = Vector2.Distance(Colliders[i].Position, Colliders[j].Position);
 
                     // Normal
-                    float nx = (Colliders[j].Position.X - Colliders[i].Position.X) / fDistance;
-                    float ny = (Colliders[j].Position.Y - Colliders[i].Position.Y) / fDistance;
+                    Vector2 n = (Colliders[j].Position - Colliders[i].Position) / fDistance;
 
-                    // Wikipedia Version - Maths is smarter but same
-                    float kx = (Colliders[i].Parent.Velocity.X - Colliders[j].Parent.Velocity.X);
-                    float ky = (Colliders[i].Parent.Velocity.Y - Colliders[j].Parent.Velocity.Y);
-                    float p = 2.0f * (nx * kx + ny * ky) / (Colliders[i].m_mass + Colliders[j].m_mass);
-                    Colliders[i].Parent.Velocity.X += -p * Colliders[j].m_mass * nx;
-                    Colliders[i].Parent.Velocity.Y += -p * Colliders[j].m_mass * ny;
+                    // Wikipedia Version - Maths is smarter
+                    Vector2 k = (Colliders[i].Parent.Velocity - Colliders[j].Parent.Velocity);
+                    float p = 2.0f * (n.X * k.X + n.Y * k.Y) / (Colliders[i].m_mass + Colliders[j].m_mass);
 
-                    Colliders[j].Parent.Velocity.X += p * Colliders[i].m_mass * nx;
-                    Colliders[j].Parent.Velocity.Y += p * Colliders[i].m_mass * ny;
+                    // Do stuff with collision response
+                    Colliders[i].Parent.Velocity += -p * Colliders[j].m_mass * n;
+                    Colliders[j].Parent.Velocity += p * Colliders[i].m_mass * n;
                 }
 
                 Colliders[i].Parent.OnCollision(Colliders[j]);

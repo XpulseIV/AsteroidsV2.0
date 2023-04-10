@@ -6,6 +6,9 @@ using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
+using Asteroids2.Source.Upgrades;
+using Asteroids2.Source.Upgrades.BaseClasses;
+using Asteroids2.Source.Upgrades.Cannons;
 using Asteroids2.Source.Utilities;
 using AstralAssault;
 using Microsoft.Xna.Framework;
@@ -24,7 +27,8 @@ public class Player : Entity, IInputEventListener
     private const float MaxSpeed = 100;
     private const float Friction = 30;
     private const float BulletSpeed = 250;
-    private const int ShootSpeed = 150;
+
+    private CannonBase m_cannon;
 
     public Player(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
@@ -40,6 +44,8 @@ public class Player : Entity, IInputEventListener
         };
 
         Color = Palette.GetColor(Palette.Colors.Blue8);
+
+        m_cannon = new Mk2Cannon();
 
         StartListening();
 
@@ -105,7 +111,7 @@ public class Player : Entity, IInputEventListener
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if ((m_lastTimeFired + ShootSpeed) > timeNow) return;
+        if ((m_lastTimeFired + m_cannon.ShootSpeed) > timeNow) return;
 
         GameState.Entities.Add(new Bullet(GameState, Position, Rotation, BulletSpeed));
 
