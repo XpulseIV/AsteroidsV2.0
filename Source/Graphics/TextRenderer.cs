@@ -6,13 +6,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Asteroids2.Source.Graphics;
 
+internal struct Letter
+{
+    public Rectangle bounds;
+    public Color[] colorData;
+}
+
 public class TextRenderer
 {
     private Game1 m_root;
 
     private Color[] m_pixelFont;
     private Texture2D m_fontThing;
-    private readonly List<Rectangle> m_letters = new List<Rectangle>();
+    private readonly List<Letter> m_letters = new List<Letter>();
 
     public void Init(Game1 root)
     {
@@ -37,7 +43,18 @@ public class TextRenderer
 
                 Rectangle charBounds = new Rectangle(x, y, len, 7);
 
-                m_letters.Add(charBounds);
+                var charColorArray = new Color[charBounds.Width * charBounds.Height];
+
+                for (int charY = 0; charY < charBounds.Height; charY++)
+                {
+                    for (int charX = 0; charX < charBounds.Width; charX++)
+                    {
+                        charColorArray[charY * charBounds.Width + charX] = m_pixelFont[
+                            (charBounds.Y + charY) * 177 + (charBounds.X + charX)];
+                    }
+                }
+
+                m_letters.Add(new Letter() { bounds = charBounds, colorData = charColorArray });
             }
         }
     }
@@ -73,31 +90,15 @@ public class TextRenderer
             {
                 int indexInLetters = (c - 32);
 
-                Rectangle letterBoundingBox = m_letters[indexInLetters];
-
-                var charColorArray = new Color[letterBoundingBox.Width * letterBoundingBox.Height];
-
-                if (c == '!')
-                {
-                    sy -= 1;
-                }
-
-                for (int charY = 0; charY < letterBoundingBox.Height; charY++)
-                {
-                    for (int charX = 0; charX < letterBoundingBox.Width; charX++)
-                    {
-                        charColorArray[charY * letterBoundingBox.Width + charX] = m_pixelFont[
-                            (letterBoundingBox.Y + charY) * 177 + (letterBoundingBox.X + charX)];
-                    }
-                }
+                Letter currentLetter = m_letters[indexInLetters];
 
                 if (scale > 1)
                 {
-                    for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                    for (int yOffset = 0; yOffset < currentLetter.bounds.Height; yOffset++)
                     {
-                        for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                        for (int xOffset = 0; xOffset < currentLetter.bounds.Width; xOffset++)
                         {
-                            if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] ==
+                            if (currentLetter.colorData[yOffset * currentLetter.bounds.Width + xOffset] ==
                                 new Color(0, 0, 0, 255))
                             {
                                 for (int yss = 0; yss < scale; yss++)
@@ -117,11 +118,11 @@ public class TextRenderer
                 }
                 else
                 {
-                    for (int yOffset = 0; yOffset < letterBoundingBox.Height; yOffset++)
+                    for (int yOffset = 0; yOffset < currentLetter.bounds.Height; yOffset++)
                     {
-                        for (int xOffset = 0; xOffset < letterBoundingBox.Width; xOffset++)
+                        for (int xOffset = 0; xOffset < currentLetter.bounds.Width; xOffset++)
                         {
-                            if (charColorArray[yOffset * letterBoundingBox.Width + xOffset] == new Color(0, 0, 0, 255))
+                            if (currentLetter.colorData[yOffset * currentLetter.bounds.Width + xOffset] == new Color(0, 0, 0, 255))
                             {
                                 m_root.PixelRenderer.DrawPixel(x + sx + xOffset, y + sy + yOffset, col);
                             }
@@ -129,12 +130,7 @@ public class TextRenderer
                     }
                 }
 
-                if (c == '!')
-                {
-                    sy += 1;
-                }
-
-                sx += letterBoundingBox.Width * scale;
+                sx += currentLetter.bounds.Width * scale;
 
                 break;
             }
@@ -150,7 +146,7 @@ public class TextRenderer
             {
                 '\n' => 0,
                 '\t' => 4 * scale,
-                _ => m_letters[(t - 32)].Width * scale
+                _ => m_letters[(t - 32)].bounds.Width * scale
             }
         );
     }

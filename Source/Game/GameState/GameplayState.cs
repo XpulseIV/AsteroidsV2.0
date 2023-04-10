@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Asteroids2.Source.Entity;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Entity.Entities;
-using AstralAssault;
+using Asteroids2.Source.Graphics;
 using Microsoft.Xna.Framework;
 #endregion
 

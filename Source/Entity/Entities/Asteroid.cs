@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
+using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Utilities;
-using AstralAssault;
 using Microsoft.Xna.Framework;
 #endregion
 

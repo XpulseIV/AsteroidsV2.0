@@ -5,12 +5,11 @@ using System.Linq;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
+using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
-using Asteroids2.Source.Upgrades;
 using Asteroids2.Source.Upgrades.BaseClasses;
 using Asteroids2.Source.Upgrades.Cannons;
 using Asteroids2.Source.Utilities;
-using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 #endregion

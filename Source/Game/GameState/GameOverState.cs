@@ -1,7 +1,7 @@
 ﻿#region
 using System;
+using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
-using AstralAssault;
 using Microsoft.Xna.Framework;
 #endregion
 

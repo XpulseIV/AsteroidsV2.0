@@ -1,5 +1,4 @@
 using Asteroids2.Source.Graphics;
-using AstralAssault;
 
 namespace Asteroids2.Source.Game.GameState.MenuStuff;
 

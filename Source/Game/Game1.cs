@@ -4,7 +4,6 @@ using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Game.GameState.MenuStuff;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
-using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,7 +13,7 @@ namespace Asteroids2.Source.Game;
 
 public class Game1 : Microsoft.Xna.Framework.Game
 {
-    internal static readonly Color BackgroundColor = new Color(28, 23, 41);
+    internal static readonly Color BackgroundColor = Palette.GetColor(Palette.Colors.Black);
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
