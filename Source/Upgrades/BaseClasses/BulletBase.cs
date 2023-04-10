@@ -1,6 +1,3 @@
 namespace Asteroids2.Source.Upgrades.BaseClasses;
 
-public class BulletBase
-{
-
-}
+public class BulletBase { }

@@ -142,8 +142,16 @@ public class TextRenderer
         }
     }
 
-    public int StringLen(string input)
+    public int StringLen(string input, int scale)
     {
-        return input.Sum(c => m_letters[(c - 32)].Width);
+        return input.Sum
+        (
+            t => t switch
+            {
+                '\n' => 0,
+                '\t' => 4 * scale,
+                _ => m_letters[(t - 32)].Width * scale
+            }
+        );
     }
 }

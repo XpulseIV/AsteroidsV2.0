@@ -1,44 +1,43 @@
-﻿using System;
+﻿#region
+using System;
 using Asteroids2.Source.Game.GameState;
+using Asteroids2.Source.Game.GameState.MenuStuff;
 using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
 using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Vector3 = Microsoft.Xna.Framework.Vector3;
+#endregion
 
 namespace Asteroids2.Source.Game;
 
 public class Game1 : Microsoft.Xna.Framework.Game
 {
-    public PixelRenderer PixelRenderer;
-
-    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
-
-    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
-
-    public GameStateMachine GameStateMachine;
-
-    // render
-    public SpriteBatch SpriteBatch;
-    private RenderTarget2D m_renderTarget;
-    public TextRenderer TextRenderer;
+    internal static readonly Color BackgroundColor = new Color(28, 23, 41);
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
+    private const int StatUpdateInterval = 300;
     private readonly Matrix m_scale;
     public readonly float ScaleX;
     public readonly float ScaleY;
 
+    public GameStateMachine GameStateMachine;
+    private float m_frameRate;
+    private long m_lastStatUpdate;
+    private KeyboardState m_prevKeyState = Keyboard.GetState();
+    private RenderTarget2D m_renderTarget;
+    private float m_renderTime;
+    public PixelRenderer PixelRenderer;
+
     // debug tools
     public bool ShowDebug;
-    private float m_frameRate;
-    private float m_renderTime;
-    private long m_lastStatUpdate;
-    private const int StatUpdateInterval = 300;
-    private KeyboardState m_prevKeyState = Keyboard.GetState();
+
+    // render
+    public SpriteBatch SpriteBatch;
+    public TextRenderer TextRenderer;
 
     public Game1()
     {
@@ -82,7 +81,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         InputEventSource.Init();
         Palette.Init();
 
-        GameStateMachine = new GameStateMachine(new GameplayState(this));
+        GameStateMachine = new GameStateMachine(new MainMenuState(this));
     }
 
     protected override void LoadContent()
@@ -158,4 +157,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         base.Draw(gameTime);
     }
+
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
+
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
 }

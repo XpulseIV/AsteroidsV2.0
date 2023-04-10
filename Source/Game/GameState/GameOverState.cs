@@ -1,25 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using Asteroids2.Source.Graphics;
+﻿#region
+using System;
 using Asteroids2.Source.Input;
 using AstralAssault;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace Asteroids2.Source.Game.GameState;
 
 public class GameOverState : GameState, IKeyboardPressedEventListener
 {
-    private static Color BackgroundColor = new Color(28, 23, 41);
-
     public GameOverState(Game1 root) : base(root)
     {
         InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
     }
 
+    public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
+    {
+        Root.GameStateMachine.ChangeState(new GameplayState(Root));
+    }
+
     public override void Draw()
     {
-        Root.PixelRenderer.ClearSimd(BackgroundColor);
+        Root.PixelRenderer.ClearSimd(Game1.BackgroundColor);
 
         Vector2 textPosition = new Vector2
         (
@@ -36,16 +38,19 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         const string gameOverString = "Game Over";
         const string restartString = "Press any key to continue!";
 
-        int gOsLenght = Root.TextRenderer.StringLen(gameOverString);
-        int rsLenght = Root.TextRenderer.StringLen(restartString);
+        int gOsLenght = Root.TextRenderer.StringLen(gameOverString, 2);
+        int rsLenght = Root.TextRenderer.StringLen(restartString, 2);
 
-        Root.TextRenderer.DrawString((int)textPosition.X - gOsLenght, (int)textPosition.Y, gameOverString, Palette.GetColor(Palette.Colors.Grey8), 2);
-        Root.TextRenderer.DrawString((int)promptPosition.X - rsLenght, (int)promptPosition.Y, restartString, Palette.GetColor(Palette.Colors.Grey9), 2);
-    }
-
-    public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
-    {
-        Root.GameStateMachine.ChangeState(new GameplayState(Root));
+        Root.TextRenderer.DrawString
+        (
+            (int)textPosition.X - gOsLenght, (int)textPosition.Y, gameOverString,
+            Palette.GetColor(Palette.Colors.Grey9), 2
+        );
+        Root.TextRenderer.DrawString
+        (
+            (int)promptPosition.X - rsLenght, (int)promptPosition.Y, restartString,
+            Palette.GetColor(Palette.Colors.Grey9), 2
+        );
     }
 
     public override void Enter() { }

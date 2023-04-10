@@ -1,27 +1,27 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace Asteroids2.Source.Entity;
 
 public class CollisionSystem
 {
-    public List<Collider> Colliders { get; } = new List<Collider>();
-    private List<Tuple<Collider, Collider>> m_lastCollisions = new List<Tuple<Collider, Collider>>();
-
     private readonly Func<float, float, float, float, float, float, bool> m_doCirclesOverlap
-        = static (x1, y1, r1, x2, y2, r2) =>
-        {
-            return MathF.Abs((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) <= ((r1 + r2) * (r1 + r2));
-        };
+        = static (x1, y1, r1, x2, y2, r2) => MathF.Abs
+            ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) <= ((r1 + r2) * (r1 + r2));
+
+    private List<Tuple<Collider, Collider>> m_lastCollisions = new List<Tuple<Collider, Collider>>();
+    public List<Collider> Colliders { get; } = new List<Collider>();
 
     public void OnUpdate(UpdateEventArgs e)
     {
-        List<Tuple<Collider, Collider>> currentCollisions = new List<Tuple<Collider, Collider>>();
+        var currentCollisions = new List<Tuple<Collider, Collider>>();
 
-        for (int i = 0; i < (Colliders.Count - 1); i++)
+        for (int i = 0; i < Colliders.Count; i++)
         {
             for (int j = 0; j < Colliders.Count; j++)
             {
@@ -35,7 +35,7 @@ public class CollisionSystem
                     )) continue;
 
                 // Collision has occured
-                Tuple<Collider, Collider> colliderPair = new Tuple<Collider, Collider>(Colliders[i], Colliders[j]);
+                var colliderPair = new Tuple<Collider, Collider>(Colliders[i], Colliders[j]);
                 currentCollisions.Add(colliderPair);
 
                 if (m_lastCollisions.Contains(colliderPair)) continue;
@@ -49,7 +49,7 @@ public class CollisionSystem
                     Vector2 n = (Colliders[j].Position - Colliders[i].Position) / fDistance;
 
                     // Wikipedia Version - Maths is smarter than what I did before
-                    Vector2 k = (Colliders[i].Parent.Velocity - Colliders[j].Parent.Velocity);
+                    Vector2 k = Colliders[i].Parent.Velocity - Colliders[j].Parent.Velocity;
                     float p = 2.0f * (n.X * k.X + n.Y * k.Y) / (Colliders[i].m_mass + Colliders[j].m_mass);
 
                     // Do stuff with collision response

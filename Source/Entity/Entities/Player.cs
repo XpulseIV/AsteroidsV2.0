@@ -1,10 +1,10 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
-using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Input;
 using Asteroids2.Source.Upgrades;
 using Asteroids2.Source.Upgrades.BaseClasses;
@@ -13,22 +13,21 @@ using Asteroids2.Source.Utilities;
 using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
+#endregion
 
 namespace Asteroids2.Source.Entity.Entities;
 
 public class Player : Entity, IInputEventListener
 {
-    private long m_lastTimeFired;
-    private float m_delta;
-
     private const float MoveSpeed = 200;
     private const float RotaionSpeed = 4.5f;
     private const float MaxSpeed = 100;
     private const float Friction = 30;
     private const float BulletSpeed = 250;
 
-    private CannonBase m_cannon;
+    private readonly CannonBase m_cannon;
+    private float m_delta;
+    private long m_lastTimeFired;
 
     public Player(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
@@ -45,7 +44,7 @@ public class Player : Entity, IInputEventListener
 
         Color = Palette.GetColor(Palette.Colors.Blue8);
 
-        m_cannon = new Mk2Cannon();
+        m_cannon = new NormalCannon();
 
         StartListening();
 
@@ -65,6 +64,28 @@ public class Player : Entity, IInputEventListener
         HP = MaxHP;
         IsFriendly = true;
     }
+
+    public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
+    {
+        int xAxis = 0;
+        int yAxis = 0;
+
+        if (e.Keys.Contains(Keys.Left)) xAxis = -1;
+        else if (e.Keys.Contains(Keys.Right)) xAxis = 1;
+
+
+        if (e.Keys.Contains(Keys.Up)) yAxis = 1;
+        else if (e.Keys.Contains(Keys.Down)) yAxis = -1;
+
+
+        if (e.Keys.Contains(Keys.Space)) HandleFiring();
+
+        HandleMovement(xAxis, yAxis);
+    }
+
+    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e) { }
+
+    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e) { }
 
     private void StartListening()
     {
@@ -133,43 +154,6 @@ public class Player : Entity, IInputEventListener
 
         base.OnDeath();
     }
-
-    public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
-    {
-        int xAxis = 0;
-        int yAxis = 0;
-
-        if (e.Keys.Contains(Keys.Left))
-        {
-            xAxis = -1;
-        }
-        else if (e.Keys.Contains(Keys.Right))
-        {
-            xAxis = 1;
-        }
-
-
-        if (e.Keys.Contains(Keys.Up))
-        {
-            yAxis = 1;
-        }
-        else if (e.Keys.Contains(Keys.Down))
-        {
-            yAxis = -1;
-        }
-
-
-        if (e.Keys.Contains(Keys.Space))
-        {
-            HandleFiring();
-        }
-
-        HandleMovement(xAxis, yAxis);
-    }
-
-    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e) { }
-
-    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e) { }
 
     public override void OnUpdate(UpdateEventArgs e)
     {

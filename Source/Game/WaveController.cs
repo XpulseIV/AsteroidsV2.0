@@ -1,26 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#region
+using System;
 using System.Linq;
 using Asteroids2.Source.Entity.Entities;
 using Asteroids2.Source.Game.GameState;
-using Asteroids2.Source.Graphics;
 using AstralAssault;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace Asteroids2.Source.Game;
 
 public class WaveController
 {
+    private const long WaveTextDuration = 2000;
+    private const long WaveDelay = 5000;
     public readonly GameplayState GameState;
     private readonly Game1 m_root;
     private int m_currentWave;
 
     private bool m_drawWaveText;
     private long m_waveTextTimer;
-    private const long WaveTextDuration = 2000;
 
     private long m_waveTimer;
-    private const long WaveDelay = 5000;
 
     public WaveController(GameplayState gameState, Game1 root)
     {

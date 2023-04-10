@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Asteroids2.Source.Graphics;
-
-namespace Asteroids2.Source.Game.GameState;
+﻿namespace Asteroids2.Source.Game.GameState;
 
 public class GameStateMachine
 {

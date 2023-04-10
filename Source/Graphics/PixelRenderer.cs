@@ -1,3 +1,4 @@
+#region
 using System;
 using System.Collections.Generic;
 using System.Runtime.Intrinsics;
@@ -6,18 +7,19 @@ using Asteroids2.Source.Game;
 using Asteroids2.Source.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace Asteroids2.Source.Graphics;
 
 public class PixelRenderer
 {
-    private int m_width;
-    private int m_height;
-
-    private Game1 m_root;
-
-    private Texture2D m_screenTexture;
     private readonly Color[] m_pixelData;
+    private readonly int m_height;
+
+    private readonly Game1 m_root;
+
+    private readonly Texture2D m_screenTexture;
+    private readonly int m_width;
 
     public PixelRenderer(Game1 root, int width, int height)
     {
@@ -61,14 +63,8 @@ public class PixelRenderer
                     if ((mask & 0x80) != 0) DrawPixel(x - x0, y - y0, c); // Q1 - upper left left
                 }
 
-                if (d < 0)
-                {
-                    d += 4 * x0++ + 6;
-                }
-                else
-                {
-                    d += 4 * (x0++ - y0--) + 10;
-                }
+                if (d < 0) d += 4 * x0++ + 6;
+                else d += 4 * (x0++ - y0--) + 10;
             }
         }
         else
@@ -146,7 +142,7 @@ public class PixelRenderer
                     px = px + 2 * dy1;
                 else
                 {
-                    if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) y = y + 1;
+                    if (((dx < 0) && (dy < 0)) || ((dx > 0) && (dy > 0))) y = y + 1;
                     else y = y - 1;
                     px = px + 2 * (dy1 - dx1);
                 }
@@ -179,7 +175,7 @@ public class PixelRenderer
                     py = py + 2 * dx1;
                 else
                 {
-                    if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) x = x + 1;
+                    if (((dx < 0) && (dy < 0)) || ((dx > 0) && (dy > 0))) x = x + 1;
                     else x = x - 1;
                     py = py + 2 * (dx1 - dy1);
                 }
@@ -192,7 +188,7 @@ public class PixelRenderer
     public void DrawWireFrameModel(List<Vector2> vecModelCoordinates, float x, float y, float r, float s, Color col)
     {
         // Create translated model vector of coordinate pairs
-        List<Vector2> vecTransformedCoordinates = new List<Vector2>();
+        var vecTransformedCoordinates = new List<Vector2>();
         int verts = vecModelCoordinates.Count;
 
         Matrix translation = Matrix.CreateTranslation(x, y, 0);
@@ -205,16 +201,13 @@ public class PixelRenderer
         world *= translation;
 
 
-        for (int i = 0; i < verts; i++)
-        {
-            vecTransformedCoordinates.Add(Vector2.Transform(vecModelCoordinates[i], world));
-        }
+        for (int i = 0; i < verts; i++) vecTransformedCoordinates.Add(Vector2.Transform(vecModelCoordinates[i], world));
 
 
         // Draw Closed Polygon
-        for (int i = 0; i < verts + 1; i++)
+        for (int i = 0; i < (verts + 1); i++)
         {
-            int j = (i + 1);
+            int j = i + 1;
 
             DrawLine
             (
@@ -226,7 +219,7 @@ public class PixelRenderer
 
     public void ClearSimd(Color color)
     {
-        if (Avx2.IsSupported && m_pixelData.Length >= 8)
+        if (Avx2.IsSupported && (m_pixelData.Length >= 8))
         {
             var colorVector = Vector256.Create(color.PackedValue);
             int numVectors = m_pixelData.Length / 8;
@@ -237,10 +230,7 @@ public class PixelRenderer
                 {
                     var pixelVectors = (Vector256<uint>*)pixels;
 
-                    for (int i = 0; i < numVectors; i++)
-                    {
-                        Avx.Store((uint*)(pixelVectors + i), colorVector);
-                    }
+                    for (int i = 0; i < numVectors; i++) Avx.Store((uint*)(pixelVectors + i), colorVector);
                 }
             }
         }

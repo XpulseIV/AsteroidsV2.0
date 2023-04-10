@@ -1,15 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region
+using Microsoft.Xna.Framework;
+#endregion
 
 namespace Asteroids2.Source.Entity.Components;
 
 public class Collider
 {
-    public Vector2 Position;
+    public readonly float m_mass;
 
     public readonly Entity Parent;
-    public int Radius;
     public bool IsSolid;
-    public readonly float m_mass;
+    public Vector2 Position;
+    public int Radius;
 
     public Collider(Entity parent, int radius, bool isSolid, float mass)
     {

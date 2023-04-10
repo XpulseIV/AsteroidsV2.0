@@ -1,24 +1,17 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Asteroids2.Source.Game;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+#endregion
 
 namespace Asteroids2.Source.Input;
 
 public static class InputEventSource
 {
-    public static event EventHandler<KeyboardEventArgs>
-        KeyboardEvent,
-        KeyboardPressedEvent;
-
-    public static event EventHandler<MouseButtonEventArgs>
-        MouseButtonEvent,
-        MouseButtonPressedEvent;
-
-    public static event EventHandler<MouseMoveEventArgs>
-        MouseMoveEvent;
+    public enum MouseButtons { Left, Right, Middle, Side1, Side2 }
 
     private static List<Keys> m_keysDown = new List<Keys>();
     private static List<Keys> m_prevKeysDown = new List<Keys>();
@@ -29,7 +22,16 @@ public static class InputEventSource
     private static Point m_mousePos;
     private static Point m_prevMousePos;
 
-    public enum MouseButtons { Left, Right, Middle, Side1, Side2 }
+    public static event EventHandler<KeyboardEventArgs>
+        KeyboardEvent,
+        KeyboardPressedEvent;
+
+    public static event EventHandler<MouseButtonEventArgs>
+        MouseButtonEvent,
+        MouseButtonPressedEvent;
+
+    public static event EventHandler<MouseMoveEventArgs>
+        MouseMoveEvent;
 
     public static void Init()
     {
@@ -55,8 +57,8 @@ public static class InputEventSource
             return;
         }
 
-        List<Keys> keysDown = new List<Keys>();
-        List<Keys> keysPressed = new List<Keys>();
+        var keysDown = new List<Keys>();
+        var keysPressed = new List<Keys>();
 
         foreach (Keys key in m_keysDown)
         {
@@ -79,7 +81,7 @@ public static class InputEventSource
         m_prevMouseDown = MouseDown;
         MouseDown.Clear();
 
-        ButtonState[] buttonStates = new ButtonState[5];
+        var buttonStates = new ButtonState[5];
         buttonStates[0] = mouseState.LeftButton;
         buttonStates[1] = mouseState.RightButton;
         buttonStates[2] = mouseState.MiddleButton;

@@ -1,22 +1,22 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
-using Asteroids2.Source.Graphics;
 using Asteroids2.Source.Utilities;
 using AstralAssault;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace Asteroids2.Source.Entity.Entities;
 
 public class Asteroid : Entity
 {
+    public enum Sizes { Smallest, Small, Medium }
     private readonly float m_rotSpeed;
     private readonly Sizes m_size;
     private bool m_hasExploded;
-
-    public enum Sizes { Smallest, Small, Medium }
 
     public Asteroid(
         GameplayState gameState,
@@ -37,13 +37,13 @@ public class Asteroid : Entity
 
         for (int i = 0; i < verts; i++)
         {
-            float noise = (float)(new Random().NextDouble()) * 0.4f + 0.8f;
+            float noise = (float)new Random().NextDouble() * 0.4f + 0.8f;
             model.Add
             (
                 new Vector2
                 (
-                    noise * MathF.Sin((i / (float)verts) * 6.28318f),
-                    noise * MathF.Cos((i / (float)verts) * 6.28318f)
+                    noise * MathF.Sin(i / (float)verts * 6.28318f),
+                    noise * MathF.Cos(i / (float)verts * 6.28318f)
                 )
             );
         }
@@ -132,9 +132,6 @@ public class Asteroid : Entity
 
         Rotation += m_rotSpeed * e.DeltaTime;
 
-        if (Rotation > Math.PI)
-        {
-            Rotation = -MathF.PI;
-        }
+        if (Rotation > Math.PI) Rotation = -MathF.PI;
     }
 }

@@ -1,7 +1,10 @@
+#region
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 
@@ -75,20 +78,6 @@ public static class Palette
         Black
     }
 
-    private struct PaletteColor
-    {
-        public byte R { get; }
-        public byte G { get; }
-        public byte B { get; }
-
-        public PaletteColor(byte r, byte g, byte b)
-        {
-            R = r;
-            G = g;
-            B = b;
-        }
-    }
-
     private static readonly List<PaletteColor> PaletteColors = new List<PaletteColor>();
 
     public static void Init()
@@ -98,9 +87,9 @@ public static class Palette
 
         foreach (string line in lines)
         {
-            byte r = byte.Parse(line[..2], System.Globalization.NumberStyles.HexNumber);
-            byte g = byte.Parse(line[2..4], System.Globalization.NumberStyles.HexNumber);
-            byte b = byte.Parse(line[4..6], System.Globalization.NumberStyles.HexNumber);
+            byte r = byte.Parse(line[..2], NumberStyles.HexNumber);
+            byte g = byte.Parse(line[2..4], NumberStyles.HexNumber);
+            byte b = byte.Parse(line[4..6], NumberStyles.HexNumber);
 
             PaletteColors.Add(new PaletteColor(r, g, b));
         }
@@ -118,5 +107,19 @@ public static class Palette
         PaletteColor color = PaletteColors[(int)name];
 
         return new Vector4(color.R / 255F, color.G / 255F, color.B / 255F, 1);
+    }
+
+    private struct PaletteColor
+    {
+        public byte R { get; }
+        public byte G { get; }
+        public byte B { get; }
+
+        public PaletteColor(byte r, byte g, byte b)
+        {
+            R = r;
+            G = g;
+            B = b;
+        }
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿#region
+using System.Collections.Generic;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Utilities;
 using AstralAssault;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace Asteroids2.Source.Entity.Entities;
 
@@ -14,7 +16,7 @@ public class Bullet : Entity
     {
         Velocity = -Vector2.UnitY.RotateVector(rotation) * speed;
 
-        model = new List<Vector2>() { new Vector2(0, 0) };
+        model = new List<Vector2> { new Vector2(0, 0) };
 
         Color = Palette.GetColor(Palette.Colors.Grey9);
 
