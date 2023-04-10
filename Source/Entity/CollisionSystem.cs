@@ -48,7 +48,7 @@ public class CollisionSystem
                     // Normal
                     Vector2 n = (Colliders[j].Position - Colliders[i].Position) / fDistance;
 
-                    // Wikipedia Version - Maths is smarter
+                    // Wikipedia Version - Maths is smarter than what I did before
                     Vector2 k = (Colliders[i].Parent.Velocity - Colliders[j].Parent.Velocity);
                     float p = 2.0f * (n.X * k.X + n.Y * k.Y) / (Colliders[i].m_mass + Colliders[j].m_mass);
 
