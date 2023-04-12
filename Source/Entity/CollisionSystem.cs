@@ -2,9 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
+using System.Runtime.Intrinsics.X86;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Microsoft.Xna.Framework;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 #endregion
 
 namespace Asteroids2.Source.Entity;
@@ -15,98 +18,114 @@ public class CollisionSystem
         = static (x1, y1, r1, x2, y2, r2) => MathF.Abs
             ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) <= ((r1 + r2) * (r1 + r2));
 
-    private List<Tuple<int, int>> m_lastCollisions = new List<Tuple<int, int>>();
+    private List<Tuple<Collider, int, Collider, int>> m_lastCollisions = new List<Tuple<Collider, int, Collider, int>>();
     public List<Collider> Colliders { get; } = new List<Collider>();
 
     public void OnUpdate(UpdateEventArgs e)
     {
-        var currentCollisions = new List<Tuple<int, int>>();
+        var currentCollisions = new List<Tuple<Collider, int, Collider, int>>();
 
-        for (int i = 0; i < Colliders.Count; i++)
+        int i = 0;
+
+        foreach (Collider collider in Colliders)
         {
-            for (int j = 0; j < Colliders.Count; j++)
+            int j = 0;
+
+            foreach (Collider other in Colliders)
             {
-                if (i == j) continue;
+                if (collider == other) continue;
 
-                if (i >= Colliders.Count || j >= Colliders.Count) // Prevent dumb crashing lol
-                {
-                    continue;
-                }
-
-                if (m_lastCollisions.BinarySearch(new Tuple<int, int>(j, i)) != -1) continue;
-
-                if (!m_doCirclesOverlap
+                if (m_doCirclesOverlap
                     (
-                        Colliders[i].Position.X, Colliders[i].Position.Y, Colliders[i].Radius, Colliders[j].Position.X,
-                        Colliders[j].Position.Y,
-                        Colliders[j].Radius
-                    )) continue;
-
-                // Collision has occured
-                var colliderPair = new Tuple<int, int>(i, j);
-                currentCollisions.Add(colliderPair);
-
-                if (m_lastCollisions.BinarySearch(colliderPair) != -1) continue;
-
-                if (Colliders[i].IsSolid && Colliders[j].IsSolid && (Colliders[i].Parent.TimeSinceSpawned > 512))
+                        collider.Position.X, collider.Position.Y, collider.Radius, other.Position.X,
+                        other.Position.Y,
+                        other.Radius
+                    ))
                 {
-                    Collider b1 = Colliders[i];
-                    Collider b2 = Colliders[j];
+                    // Collision has occurred
+                    var colliderPair = new Tuple<Collider, int, Collider, int>(collider, i, other, j);
 
-                    // Distance between balls
-                    float fDistance = MathF.Sqrt((b1.Position.X - b2.Position.X)*(b1.Position.X - b2.Position.X) + (b1.Position.Y - b2.Position.Y)*(b1.Position.Y - b2.Position.Y));
+                    if (m_lastCollisions.BinarySearch(colliderPair) != -1) continue;
+                    if (currentCollisions.BinarySearch(new Tuple<Collider, int, Collider, int>(other, j, collider, i)) != -1) continue;
 
-                    // Normal
-                    float nx = (b2.Position.X - b1.Position.X) / fDistance;
-                    float ny = (b2.Position.Y - b1.Position.Y) / fDistance;
+                    currentCollisions.Add(colliderPair);
 
-                    // Wikipedia Version - Maths is smarter than what I did ´before, and it works
-                    float kx = (b1.Parent.Velocity.X - b2.Parent.Velocity.X);
-                    float ky = (b1.Parent.Velocity.Y - b2.Parent.Velocity.Y);
-                    float p = 2.0f * (nx * kx + ny * ky) / (b1.m_mass + b2.m_mass);
-                    b1.Parent.Velocity.X += b1.Parent.Velocity.X - p * b2.m_mass * nx;
-                    b1.Parent.Velocity.Y += b1.Parent.Velocity.Y - p * b2.m_mass * ny;
-                    b2.Parent.Velocity.X += b2.Parent.Velocity.X + p * b1.m_mass * nx;
-                    b2.Parent.Velocity.Y += b2.Parent.Velocity.Y + p * b1.m_mass * ny;
 
-                    if (b1.Parent.Velocity.Length() > Entity.MaxSpeed)
+                    if (collider.IsSolid && other.IsSolid)
                     {
-                        b1.Parent.Velocity.Normalize();
-                        b1.Parent.Velocity *= Entity.MaxSpeed;
-                    }
-                    else if (b1.Parent.Velocity.Length() < -Entity.MaxSpeed)
-                    {
-                        b1.Parent.Velocity.Normalize();
-                        b1.Parent.Velocity *= -Entity.MaxSpeed;
-                    }
+                        // Distance between ball centers
+                        float fDistance = Vector2.Distance(collider.Position, other.Position);
 
-                    if (b2.Parent.Velocity.Length() > Entity.MaxSpeed)
-                    {
-                        b2.Parent.Velocity.Normalize();
-                        b2.Parent.Velocity *= Entity.MaxSpeed;
-                    }
-                    else if (b2.Parent.Velocity.Length() < -Entity.MaxSpeed)
-                    {
-                        b2.Parent.Velocity.Normalize();
-                        b2.Parent.Velocity *= -Entity.MaxSpeed;
+                        // Calculate displacement required
+                        float fOverlap = 0.5f * (fDistance - collider.Radius - other.Radius);
+
+                        // Displace Current Ball away from collision
+                        collider.Parent.Position.X -= fOverlap * (collider.Position.X - other.Position.X) / fDistance;
+                        collider.Parent.Position.Y -= fOverlap * (collider.Position.Y - other.Position.Y) / fDistance;
+
+                        // Displace Target Ball away from collision
+                        other.Parent.Position.X += fOverlap * (collider.Position.X - other.Position.X) / fDistance;
+                        other.Parent.Position.Y += fOverlap * (collider.Position.Y - other.Position.Y) / fDistance;
                     }
                 }
 
-                Debug.WriteLine("hellew");
-
-                Colliders[i].Parent.OnCollision(Colliders[j]);
-
-                if (i >= Colliders.Count || j >= Colliders.Count) // Prevent dumb crashing lol
-                {
-                    continue;
-                }
-
-                Colliders[j].Parent.OnCollision(Colliders[i]);
+                j++;
             }
+
+            i++;
         }
-        
+
+        foreach ((Collider b1, int _, Collider b2, int _) in currentCollisions)
+        {
+            if (b1.IsSolid && b2.IsSolid && (b1.Parent.TimeSinceSpawned > 512))
+            {
+                // Distance between balls
+                float fDistance = Vector2.Distance(b1.Position, b2.Position);
+
+                // Normal
+                float nx = (b1.Position.X - b2.Position.X) / fDistance;
+                float ny = (b1.Position.Y - b2.Position.Y) / fDistance;
+
+                // Wikipedia Version - Maths is smarter than what I did before, and it works
+                float kx = (b1.Parent.Velocity.X - b2.Parent.Velocity.X);
+                float ky = (b1.Parent.Velocity.Y - b2.Parent.Velocity.Y);
+                float p = 2.0f * (nx * kx + ny * ky) / (b1.m_mass + b2.m_mass);
+                b1.Parent.Velocity.X += b1.Parent.Velocity.X - p * b2.m_mass * nx;
+                b1.Parent.Velocity.Y += b1.Parent.Velocity.Y - p * b2.m_mass * ny;
+                b2.Parent.Velocity.X += b2.Parent.Velocity.X + p * b1.m_mass * nx;
+                b2.Parent.Velocity.Y += b2.Parent.Velocity.Y + p * b1.m_mass * ny;
+
+
+                if (b1.Parent.Velocity.Length() > Entity.MaxSpeed)
+                {
+                    b1.Parent.Velocity.Normalize();
+                    b1.Parent.Velocity *= Entity.MaxSpeed;
+                }
+                else if (b1.Parent.Velocity.Length() < -Entity.MaxSpeed)
+                {
+                    b1.Parent.Velocity.Normalize();
+                    b1.Parent.Velocity *= -Entity.MaxSpeed;
+                }
+
+                if (b2.Parent.Velocity.Length() > Entity.MaxSpeed)
+                {
+                    b2.Parent.Velocity.Normalize();
+                    b2.Parent.Velocity *= Entity.MaxSpeed;
+                }
+                else if (b2.Parent.Velocity.Length() < -Entity.MaxSpeed)
+                {
+                    b2.Parent.Velocity.Normalize();
+                    b2.Parent.Velocity *= -Entity.MaxSpeed;
+                }
+            }
+
+            b1.Parent.OnCollision(b2);
+            b2.Parent.OnCollision(b1);
+        }
+
         m_lastCollisions = currentCollisions;
     }
+
 
     public void AddCollider(Collider collider)
     {

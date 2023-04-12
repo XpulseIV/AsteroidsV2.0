@@ -62,7 +62,7 @@ public class Player : Entity, IInputEventListener
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
         IsActor = true;
-        MaxHP = 50;
+        MaxHP = 5000;
         HP = MaxHP;
         IsFriendly = true;
     }
