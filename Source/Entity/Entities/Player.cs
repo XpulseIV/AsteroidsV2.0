@@ -20,7 +20,6 @@ public class Player : Entity, IInputEventListener
 {
     private const float MoveSpeed = 200;
     private const float RotaionSpeed = 4.5f;
-    private const float MaxSpeed = 100;
     private const float Friction = 30;
     private const float BulletSpeed = 250;
 

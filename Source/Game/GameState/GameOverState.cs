@@ -43,12 +43,12 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
         Root.TextRenderer.DrawString
         (
-            (int)textPosition.X - gOsLenght, (int)textPosition.Y, gameOverString,
+            (int)textPosition.X - gOsLenght / 2, (int)textPosition.Y, gameOverString,
             Palette.GetColor(Palette.Colors.Grey9), 2
         );
         Root.TextRenderer.DrawString
         (
-            (int)promptPosition.X - rsLenght, (int)promptPosition.Y, restartString,
+            (int)promptPosition.X - rsLenght / 2, (int)promptPosition.Y, restartString,
             Palette.GetColor(Palette.Colors.Grey9), 2
         );
     }

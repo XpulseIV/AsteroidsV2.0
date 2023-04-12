@@ -35,6 +35,8 @@ public class Entity
     protected int size;
     public Vector2 Velocity;
 
+    public const float MaxSpeed = 100;
+
     protected Entity(GameplayState gameState, Vector2 position)
     {
         GameState = gameState;

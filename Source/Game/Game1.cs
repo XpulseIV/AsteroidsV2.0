@@ -80,7 +80,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         InputEventSource.Init();
         Palette.Init();
 
-        GameStateMachine = new GameStateMachine(new MainMenuState(this));
+        GameStateMachine = new GameStateMachine(new GameplayState(this));
     }
 
     protected override void LoadContent()

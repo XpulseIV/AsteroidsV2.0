@@ -42,19 +42,46 @@ public class CollisionSystem
 
                 if (Colliders[i].IsSolid && Colliders[j].IsSolid && (Colliders[i].Parent.TimeSinceSpawned > 512))
                 {
+                    Collider b1 = Colliders[i];
+                    Collider b2 = Colliders[j];
+
                     // Distance between balls
-                    float fDistance = Vector2.Distance(Colliders[i].Position, Colliders[j].Position);
+                    float fDistance = MathF.Sqrt((b1.Position.X - b2.Position.X)*(b1.Position.X - b2.Position.X) + (b1.Position.Y - b2.Position.Y)*(b1.Position.Y - b2.Position.Y));
 
                     // Normal
-                    Vector2 n = (Colliders[j].Position - Colliders[i].Position) / fDistance;
+                    float nx = (b2.Position.X - b1.Position.X) / fDistance;
+                    float ny = (b2.Position.Y - b1.Position.Y) / fDistance;
 
-                    // Wikipedia Version - Maths is smarter than what I did before
-                    Vector2 k = Colliders[i].Parent.Velocity - Colliders[j].Parent.Velocity;
-                    float p = 2.0f * (n.X * k.X + n.Y * k.Y) / (Colliders[i].m_mass + Colliders[j].m_mass);
+                    // Wikipedia Version - Maths is smarter but same
+                    float kx = (b1.Parent.Velocity.X - b2.Parent.Velocity.X);
+                    float ky = (b1.Parent.Velocity.Y - b2.Parent.Velocity.Y);
+                    float p = 2.0f * (nx * kx + ny * ky) / (b1.m_mass + b2.m_mass);
+                    b1.Parent.Velocity.X += b1.Parent.Velocity.X - p * b2.m_mass * nx;
+                    b1.Parent.Velocity.Y += b1.Parent.Velocity.Y - p * b2.m_mass * ny;
+                    b2.Parent.Velocity.X += b2.Parent.Velocity.X + p * b1.m_mass * nx;
+                    b2.Parent.Velocity.Y += b2.Parent.Velocity.Y + p * b1.m_mass * ny;
 
-                    // Do stuff with collision response
-                    Colliders[i].Parent.Velocity += -p * Colliders[j].m_mass * n;
-                    Colliders[j].Parent.Velocity += p * Colliders[i].m_mass * n;
+                    if (b1.Parent.Velocity.Length() > Entity.MaxSpeed)
+                    {
+                        b1.Parent.Velocity.Normalize();
+                        b1.Parent.Velocity *= Entity.MaxSpeed;
+                    }
+                    else if (b1.Parent.Velocity.Length() < -Entity.MaxSpeed)
+                    {
+                        b1.Parent.Velocity.Normalize();
+                        b1.Parent.Velocity *= -Entity.MaxSpeed;
+                    }
+
+                    if (b2.Parent.Velocity.Length() > Entity.MaxSpeed)
+                    {
+                        b2.Parent.Velocity.Normalize();
+                        b2.Parent.Velocity *= Entity.MaxSpeed;
+                    }
+                    else if (b2.Parent.Velocity.Length() < -Entity.MaxSpeed)
+                    {
+                        b2.Parent.Velocity.Normalize();
+                        b2.Parent.Velocity *= -Entity.MaxSpeed;
+                    }
                 }
 
                 Colliders[i].Parent.OnCollision(Colliders[j]);

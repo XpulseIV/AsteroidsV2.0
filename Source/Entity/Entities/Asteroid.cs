@@ -128,6 +128,17 @@ public class Asteroid : Entity
 
     public override void OnUpdate(UpdateEventArgs e)
     {
+        // apply friction
+        float sign = Math.Sign(Velocity.Length());
+
+        if (sign != 0)
+        {
+            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
+
+            Velocity -=
+                Vector2.UnitX.RotateVector(direction) * 5 * e.DeltaTime * sign;
+        }
+
         base.OnUpdate(e);
 
         Rotation += m_rotSpeed * e.DeltaTime;
