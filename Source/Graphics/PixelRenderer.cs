@@ -13,13 +13,14 @@ namespace Asteroids2.Source.Graphics;
 
 public class PixelRenderer
 {
-    private readonly Color[] m_pixelData;
+    public readonly Color[] m_pixelData;
+
+    private readonly int m_width;
     private readonly int m_height;
 
     private readonly Game1 m_root;
 
     private readonly Texture2D m_screenTexture;
-    private readonly int m_width;
 
     public PixelRenderer(Game1 root, int width, int height)
     {

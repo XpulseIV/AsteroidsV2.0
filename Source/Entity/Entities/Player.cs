@@ -27,11 +27,15 @@ public class Player : Entity, IInputEventListener
     private float m_delta;
     private long m_lastTimeFired;
 
+    public int m_money;
+
     public Player(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
         Position = position;
         Rotation = 0;
         size = 1;
+
+        m_money = 0;
 
         model = new List<Vector2>
         {
@@ -42,7 +46,7 @@ public class Player : Entity, IInputEventListener
 
         Color = Palette.GetColor(Palette.Colors.Blue8);
 
-        m_cannon = new NormalCannon();
+        m_cannon = new Mk3Cannon();
 
         StartListening();
 
@@ -132,7 +136,22 @@ public class Player : Entity, IInputEventListener
 
         if ((m_lastTimeFired + m_cannon.ShootSpeed) > timeNow) return;
 
-        GameState.Entities.Add(new Bullet(GameState, Position, Rotation, BulletSpeed));
+        var positiveRotMat = Matrix.CreateRotationZ(Rotation + 15.0f);
+
+        var cannonPos = Position + Vector2.UnitY.RotateVector(Rotation);
+
+        GameState.Entities.Add(new Bullet(GameState, cannonPos, Rotation, BulletSpeed));
+
+        var idk = new Mk3Cannon();
+
+        if (m_cannon.GetType() == idk.GetType())
+        {
+            GameState.Entities.Add(new Bullet(GameState, cannonPos + Vector2.Transform(Vector2.UnitX, -positiveRotMat), Rotation, BulletSpeed));
+            GameState.Entities.Add(new Bullet(GameState, cannonPos + Vector2.Transform(Vector2.UnitX, positiveRotMat), Rotation, BulletSpeed));
+
+            GameState.Entities.Add(new Bullet(GameState, cannonPos - Vector2.Transform(Vector2.UnitX, -positiveRotMat), Rotation, BulletSpeed));
+            GameState.Entities.Add(new Bullet(GameState, cannonPos - Vector2.Transform(Vector2.UnitX, positiveRotMat), Rotation, BulletSpeed));
+        }
 
         m_lastTimeFired = timeNow;
     }

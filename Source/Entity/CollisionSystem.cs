@@ -1,6 +1,7 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Microsoft.Xna.Framework;
@@ -25,7 +26,14 @@ public class CollisionSystem
         {
             for (int j = 0; j < Colliders.Count; j++)
             {
-                if (Colliders[i] == Colliders[j]) continue;
+                if (i == j) continue;
+
+                if (i >= Colliders.Count || j >= Colliders.Count) // Prevent dumb crashing lol
+                {
+                    continue;
+                }
+
+                if (currentCollisions.Contains(new Tuple<Collider, Collider>(Colliders[j], Colliders[i]))) continue;
 
                 if (!m_doCirclesOverlap
                     (
@@ -52,7 +60,7 @@ public class CollisionSystem
                     float nx = (b2.Position.X - b1.Position.X) / fDistance;
                     float ny = (b2.Position.Y - b1.Position.Y) / fDistance;
 
-                    // Wikipedia Version - Maths is smarter but same
+                    // Wikipedia Version - Maths is smarter than what I did ´before, and it works
                     float kx = (b1.Parent.Velocity.X - b2.Parent.Velocity.X);
                     float ky = (b1.Parent.Velocity.Y - b2.Parent.Velocity.Y);
                     float p = 2.0f * (nx * kx + ny * ky) / (b1.m_mass + b2.m_mass);
@@ -84,11 +92,19 @@ public class CollisionSystem
                     }
                 }
 
+                Debug.WriteLine("hellew");
+
                 Colliders[i].Parent.OnCollision(Colliders[j]);
+
+                if (i >= Colliders.Count || j >= Colliders.Count) // Prevent dumb crashing lol
+                {
+                    continue;
+                }
+
                 Colliders[j].Parent.OnCollision(Colliders[i]);
             }
         }
-
+        
         m_lastCollisions = currentCollisions;
     }
 

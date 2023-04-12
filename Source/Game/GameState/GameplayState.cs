@@ -37,6 +37,8 @@ public class GameplayState : GameState
 
         if (!Root.ShowDebug) return;
 
+        Root.TextRenderer.DrawString(0, 21, Player.m_money.ToString(), Palette.GetColor(Palette.Colors.Blue7), 1);
+
         foreach (Collider collider in CollisionSystem.Colliders)
         {
             Root.PixelRenderer.DrawCircle

@@ -123,11 +123,22 @@ public class Asteroid : Entity
 
         m_hasExploded = true;
 
+        GameState.Player.m_money += 50;
+
         base.OnDeath();
     }
 
     public override void OnUpdate(UpdateEventArgs e)
     {
+        base.OnUpdate(e);
+
+        Rotation += m_rotSpeed * e.DeltaTime;
+
+        if (Rotation > Math.PI)
+        {
+            Rotation = -MathF.PI;
+        }
+
         // apply friction
         float sign = Math.Sign(Velocity.Length());
 
@@ -138,11 +149,5 @@ public class Asteroid : Entity
             Velocity -=
                 Vector2.UnitX.RotateVector(direction) * 5 * e.DeltaTime * sign;
         }
-
-        base.OnUpdate(e);
-
-        Rotation += m_rotSpeed * e.DeltaTime;
-
-        if (Rotation > Math.PI) Rotation = -MathF.PI;
     }
 }
