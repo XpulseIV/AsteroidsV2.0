@@ -15,12 +15,12 @@ public class CollisionSystem
         = static (x1, y1, r1, x2, y2, r2) => MathF.Abs
             ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) <= ((r1 + r2) * (r1 + r2));
 
-    private List<Tuple<Collider, Collider>> m_lastCollisions = new List<Tuple<Collider, Collider>>();
+    private List<Tuple<int, int>> m_lastCollisions = new List<Tuple<int, int>>();
     public List<Collider> Colliders { get; } = new List<Collider>();
 
     public void OnUpdate(UpdateEventArgs e)
     {
-        var currentCollisions = new List<Tuple<Collider, Collider>>();
+        var currentCollisions = new List<Tuple<int, int>>();
 
         for (int i = 0; i < Colliders.Count; i++)
         {
@@ -33,7 +33,7 @@ public class CollisionSystem
                     continue;
                 }
 
-                if (currentCollisions.Contains(new Tuple<Collider, Collider>(Colliders[j], Colliders[i]))) continue;
+                if (m_lastCollisions.BinarySearch(new Tuple<int, int>(j, i)) != -1) continue;
 
                 if (!m_doCirclesOverlap
                     (
@@ -43,10 +43,10 @@ public class CollisionSystem
                     )) continue;
 
                 // Collision has occured
-                var colliderPair = new Tuple<Collider, Collider>(Colliders[i], Colliders[j]);
+                var colliderPair = new Tuple<int, int>(i, j);
                 currentCollisions.Add(colliderPair);
 
-                if (m_lastCollisions.Contains(colliderPair)) continue;
+                if (m_lastCollisions.BinarySearch(colliderPair) != -1) continue;
 
                 if (Colliders[i].IsSolid && Colliders[j].IsSolid && (Colliders[i].Parent.TimeSinceSpawned > 512))
                 {
