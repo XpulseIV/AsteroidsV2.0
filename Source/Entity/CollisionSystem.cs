@@ -1,7 +1,6 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
-using System.Numerics;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -93,25 +92,6 @@ public class CollisionSystem
         {
             if (b1.IsSolid && b2.IsSolid && (b1.Parent.TimeSinceSpawned > 512))
             {
-                Vector2 v1Part1 = b1.Parent.Velocity;
-                float v1Part2 = (2 * b2.m_mass) / (b1.m_mass + b2.m_mass);
-                float v1Part3 = Vector2.Dot(b1.Parent.Velocity - b2.Parent.Velocity, b1.Position - b2.Position) /
-                    ((b1.Position - b2.Position).Length() * (b1.Position - b2.Position).Length());
-                Vector2 v1Part4 = (b1.Position - b2.Position);
-
-                Vector2 newVel1 = v1Part1 - (v1Part2 * v1Part3 * v1Part4);
-                b1.Parent.Velocity = newVel1;
-
-                Vector2 v2Part1 = b2.Parent.Velocity;
-                float v2Part2 = (2 * b1.m_mass) / (b1.m_mass + b2.m_mass);
-                float v2Part3 = Vector2.Dot(b2.Parent.Velocity - b1.Parent.Velocity, b2.Position - b1.Position) /
-                    ((b2.Position - b1.Position).Length() * (b2.Position - b1.Position).Length());
-                Vector2 v2part4 = (b2.Position - b1.Position);
-
-                Vector2 newVel2 = v2Part1 - (v2Part2 * v2Part3 * v2part4);
-                b2.Parent.Velocity = newVel2;
-
-                /*
                 // Distance between balls
                 float fDistance = Vector2.Distance(b1.Position, b2.Position);
 
@@ -150,7 +130,6 @@ public class CollisionSystem
                     b2.Parent.Velocity.Normalize();
                     b2.Parent.Velocity *= -Entity.MaxSpeed;
                 }
-            */
             }
 
             b1.Parent.OnCollision(b2);
