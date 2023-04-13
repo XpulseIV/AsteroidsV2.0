@@ -1,16 +1,27 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.Intrinsics.X86;
 using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
-using Microsoft.Xna.Framework;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 #endregion
 
 namespace Asteroids2.Source.Entity;
+
+class tupleComaparer : IComparer<Tuple<Collider, int, Collider, int>>
+{
+    public int Compare(Tuple<Collider, int, Collider, int> x, Tuple<Collider, int, Collider, int> y)
+    {
+        if (ReferenceEquals(x, y)) return 0;
+        if (ReferenceEquals(null, y)) return 1;
+        if (ReferenceEquals(null, x)) return -1;
+        int item2Comparison = Comparer<int>.Default.Compare(x.Item2, y.Item2);
+
+        if (item2Comparison != 0) return item2Comparison;
+
+        return Comparer<int>.Default.Compare(x.Item4, y.Item4);
+    }
+}
 
 public class CollisionSystem
 {
@@ -20,6 +31,8 @@ public class CollisionSystem
 
     private List<Tuple<Collider, int, Collider, int>> m_lastCollisions = new List<Tuple<Collider, int, Collider, int>>();
     public List<Collider> Colliders { get; } = new List<Collider>();
+    
+    private IComparer<Tuple<Collider, int, Collider, int>> m_compyes = new tupleComaparer();
 
     public void OnUpdate(UpdateEventArgs e)
     {
@@ -45,8 +58,8 @@ public class CollisionSystem
                     // Collision has occurred
                     var colliderPair = new Tuple<Collider, int, Collider, int>(collider, i, other, j);
 
-                    if (m_lastCollisions.BinarySearch(colliderPair) != -1) continue;
-                    if (currentCollisions.BinarySearch(new Tuple<Collider, int, Collider, int>(other, j, collider, i)) != -1) continue;
+                    if (m_lastCollisions.BinarySearch(colliderPair, m_compyes) != -1) continue;
+                    if (currentCollisions.BinarySearch(new Tuple<Collider, int, Collider, int>(other, j, collider, i), m_compyes) != -1) continue;
 
                     currentCollisions.Add(colliderPair);
 
