@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
@@ -44,20 +43,13 @@ public class Player : Entity, IInputEventListener
             new Vector2(2.5f, 2.5f)
         };
 
+        Bounds = new Rectangle((int)position.X, (int)position.Y, 6, 6);
+
         Color = Palette.GetColor(Palette.Colors.Blue8);
 
         m_cannon = new Mk3Cannon();
 
         StartListening();
-
-        Collider = new Collider
-        (
-            this,
-            6,
-            true,
-            5
-        );
-        GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
@@ -79,8 +71,37 @@ public class Player : Entity, IInputEventListener
         if (e.Keys.Contains(Keys.Up)) yAxis = 1;
         else if (e.Keys.Contains(Keys.Down)) yAxis = -1;
 
-
         if (e.Keys.Contains(Keys.Space)) HandleFiring();
+
+        if (e.Keys.Contains(Keys.G))
+        {
+            Random rnd = new();
+
+            int side = rnd.Next(0, 4);
+
+            int x = side switch
+            {
+                0 => 0,
+                1 => Game1.TargetWidth,
+                2 => rnd.Next(0, Game1.TargetWidth),
+                3 => rnd.Next(0, Game1.TargetWidth),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            int y = side switch
+            {
+                0 => rnd.Next(0, Game1.TargetHeight),
+                1 => rnd.Next(0, Game1.TargetHeight),
+                2 => 0,
+                3 => Game1.TargetHeight,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            Vector2 position = new(x, y);
+            Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
+            
+            GameState.Entities.Add(new Asteroid(GameState, position, 0, size));
+        }
 
         HandleMovement(xAxis, yAxis);
     }

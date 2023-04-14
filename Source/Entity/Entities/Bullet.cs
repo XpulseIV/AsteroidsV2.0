@@ -1,6 +1,5 @@
 ﻿#region
 using System.Collections.Generic;
-using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
@@ -18,27 +17,15 @@ public class Bullet : Entity
 
         model = new List<Vector2> { new Vector2(0, 0) };
 
-        Color = Palette.GetColor(Palette.Colors.Grey9);
+        Bounds = new Rectangle((int)position.X, (int)position.Y, 1, 1);
 
-        Collider = new Collider
-        (
-            this,
-            3
-        );
-        GameState.CollisionSystem.AddCollider(Collider);
+        Color = Palette.GetColor(Palette.Colors.Grey9);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
 
         ContactDamage = 5;
         IsFriendly = true;
         size = 1;
-    }
-
-    public override void OnCollision(Collider other)
-    {
-        if (IsFriendly == other.Parent.IsFriendly) return;
-
-        Destroy();
     }
 
     public override void OnUpdate(UpdateEventArgs e)

@@ -1,7 +1,6 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
-using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
@@ -32,6 +31,8 @@ public class Asteroid : Entity
         const int verts = 20;
 
         model = new List<Vector2>();
+
+        Bounds = new Rectangle((int)position.X, (int)position.Y, ((int)m_size + 1) * 4, ((int)m_size + 1) * 4);
 
         Color = Palette.GetColor(Palette.Colors.Red6);
 
@@ -85,15 +86,6 @@ public class Asteroid : Entity
         default:
             throw new ArgumentOutOfRangeException();
         }
-
-        Collider = new Collider
-        (
-            this,
-            ((int)m_size + 1) * 4,
-            true,
-            mass
-        );
-        GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 

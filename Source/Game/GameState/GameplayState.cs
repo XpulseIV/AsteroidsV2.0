@@ -1,25 +1,27 @@
 ﻿#region
 using System.Collections.Generic;
-using Asteroids2.Source.Entity;
-using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Entity.Entities;
 using Asteroids2.Source.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Quadtree = Asteroids2.Source.Entity.ColStuff.QuadTree;
 #endregion
 
 namespace Asteroids2.Source.Game.GameState;
 
 public class GameplayState : GameState
 {
-    public readonly CollisionSystem CollisionSystem = new CollisionSystem();
-
     public readonly List<Entity.Entity> Entities;
     public WaveController WaveController;
+
+    public Quadtree Qt;
 
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity.Entity>();
         WaveController = new WaveController(this, Root);
+
+        Qt = new Quadtree(0, new Rectangle(0, 0, Game1.TargetWidth, Game1.TargetWidth));
     }
 
     public Player Player
@@ -33,18 +35,17 @@ public class GameplayState : GameState
 
         foreach (Entity.Entity entity in Entities) entity.Draw();
 
+        Qt.Draw(Root);
         WaveController.Draw();
 
         if (!Root.ShowDebug) return;
 
         Root.TextRenderer.DrawString(0, 21, Player.m_money.ToString(), Palette.GetColor(Palette.Colors.Blue7), 1);
 
-        foreach (Collider collider in CollisionSystem.Colliders)
+        foreach (Entity.Entity entity in Entities)
         {
-            Root.PixelRenderer.DrawCircle
-            (
-                (int)collider.Position.X, (int)collider.Position.Y, collider.Radius,
-                Palette.GetColor(Palette.Colors.Green8), 0xff
+            Root.PixelRenderer.FillRect((int)entity.Bounds.X, (int)entity.Bounds.Y, entity.Bounds.Width, entity.Bounds.Height,
+                new Color(Palette.GetColor(Palette.Colors.Green8), 0.8f)
             );
         }
     }
@@ -65,7 +66,7 @@ public class GameplayState : GameState
     {
         for (int i = 0; i < Entities.Count; i++) Entities[i].OnUpdate(e);
 
-        CollisionSystem.OnUpdate(e);
+        Qt.Update(e.Gt, Entities);
         WaveController.OnUpdate(e);
     }
 }

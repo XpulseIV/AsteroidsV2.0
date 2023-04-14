@@ -1,12 +1,13 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
-using Asteroids2.Source.Entity.Components;
 using Asteroids2.Source.Game;
 using Asteroids2.Source.Game.GameState;
 using Asteroids2.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.Collisions;
 #endregion
 
 namespace Asteroids2.Source.Entity;
@@ -16,7 +17,6 @@ public class Entity
     protected readonly GameplayState GameState;
 
     private readonly long m_timeSpawned;
-    protected Collider Collider;
     protected Color Color;
     protected float ContactDamage;
     protected float HP;
@@ -37,6 +37,8 @@ public class Entity
 
     public const float MaxSpeed = 100;
 
+    public Rectangle Bounds;
+
     protected Entity(GameplayState gameState, Vector2 position)
     {
         GameState = gameState;
@@ -51,7 +53,8 @@ public class Entity
 
     public virtual void OnUpdate(UpdateEventArgs e)
     {
-        Collider.SetPosition(Position);
+        Bounds.X = (int)(Position.X - Bounds.Width / 2f);
+        Bounds.Y = (int)(Position.Y - Bounds.Height / 2f);
 
         if (IsActor && (HP <= 0))
         {
@@ -103,13 +106,6 @@ public class Entity
         }
     }
 
-    public virtual void OnCollision(Collider other)
-    {
-        if (!IsActor || (other.Parent.IsFriendly == IsFriendly)) return;
-
-        HP = Math.Max(0, HP - other.Parent.ContactDamage);
-    }
-
     public virtual void Draw()
     {
         GameState.Root.PixelRenderer.DrawWireFrameModel(model, Position.X, Position.Y, Rotation, size, Color);
@@ -120,7 +116,6 @@ public class Entity
     public virtual void Destroy()
     {
         GameState.Entities.Remove(this);
-        GameState.CollisionSystem.RemoveCollider(Collider);
     }
 
     protected virtual void OnDeath()
@@ -148,4 +143,6 @@ public class Entity
     }
 
     protected enum OutOfBounds { DoNothing, Wrap, Destroy }
+
+    public virtual void OnCollision(Entity other) { }
 }
