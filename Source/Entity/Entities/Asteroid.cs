@@ -32,7 +32,7 @@ public class Asteroid : Entity
 
         model = new List<Vector2>();
 
-        Bounds = new Rectangle((int)position.X, (int)position.Y, ((int)m_size + 1) * 4, ((int)m_size + 1) * 4);
+        Bounds = new Rectangle((int)position.X, (int)position.Y, ((int)m_size + 1) * 4 + 2, ((int)m_size + 1) * 4 + 2);
 
         Color = Palette.GetColor(Palette.Colors.Red6);
 
@@ -55,15 +55,13 @@ public class Asteroid : Entity
 
         Velocity = Vector2.UnitX.RotateVector(direction) * speed;
 
-        float mass;
-
         switch (size)
         {
         case Sizes.Smallest:
             MaxHP = 12;
             HP = MaxHP;
             ContactDamage = 5;
-            mass = 6;
+            Mass = 6;
 
             break;
 
@@ -71,7 +69,7 @@ public class Asteroid : Entity
             MaxHP = 24;
             HP = MaxHP;
             ContactDamage = 7;
-            mass = 12;
+            Mass = 12;
 
             break;
 
@@ -79,7 +77,7 @@ public class Asteroid : Entity
             MaxHP = 36;
             HP = MaxHP;
             ContactDamage = 12;
-            mass = 18;
+            Mass = 18;
 
             break;
 
@@ -90,6 +88,7 @@ public class Asteroid : Entity
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
         IsActor = true;
+        IsSolid = true;
     }
 
     protected override void OnDeath()

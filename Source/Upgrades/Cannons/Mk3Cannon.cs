@@ -9,7 +9,7 @@ namespace Asteroids2.Source.Upgrades.Cannons
 {
     internal class Mk3Cannon : CannonBase
     {
-        public Mk3Cannon() 
+        public Mk3Cannon()
         {
             ShootSpeed = 25;
         }

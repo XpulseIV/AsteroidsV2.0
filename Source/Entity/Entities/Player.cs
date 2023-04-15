@@ -57,6 +57,9 @@ public class Player : Entity, IInputEventListener
         MaxHP = 5000;
         HP = MaxHP;
         IsFriendly = true;
+        IsSolid = true;
+
+        Mass = 7;
     }
 
     public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
@@ -87,7 +90,7 @@ public class Player : Entity, IInputEventListener
                 3 => rnd.Next(0, Game1.TargetWidth),
                 _ => throw new ArgumentOutOfRangeException()
             };
-            
+
             int y = side switch
             {
                 0 => rnd.Next(0, Game1.TargetHeight),
@@ -96,10 +99,10 @@ public class Player : Entity, IInputEventListener
                 3 => Game1.TargetHeight,
                 _ => throw new ArgumentOutOfRangeException()
             };
-            
+
             Vector2 position = new(x, y);
             Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
-            
+
             GameState.Entities.Add(new Asteroid(GameState, position, 0, size));
         }
 

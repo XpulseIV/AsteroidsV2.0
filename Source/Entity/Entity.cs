@@ -39,6 +39,9 @@ public class Entity
 
     public Rectangle Bounds;
 
+    public bool IsSolid;
+    public int Mass;
+
     protected Entity(GameplayState gameState, Vector2 position)
     {
         GameState = gameState;
@@ -144,5 +147,10 @@ public class Entity
 
     protected enum OutOfBounds { DoNothing, Wrap, Destroy }
 
-    public virtual void OnCollision(Entity other) { }
+    public virtual void OnCollision(Entity other)
+    {
+        if (!IsActor || (other.IsFriendly == IsFriendly)) return;
+
+        HP = Math.Max(0, HP - other.ContactDamage);
+    }
 }

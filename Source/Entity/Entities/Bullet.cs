@@ -26,6 +26,8 @@ public class Bullet : Entity
         ContactDamage = 5;
         IsFriendly = true;
         size = 1;
+
+        IsSolid = false;
     }
 
     public override void OnUpdate(UpdateEventArgs e)
