@@ -96,6 +96,11 @@ public class PixelRenderer
         DrawLine(x, y + h, x, y, c);
     }
 
+    public void DrawRect(Vector2 p, Vector2 s, Color c)
+    {
+        DrawRect((int)p.X, (int)p.Y, (int)s.X, (int)s.Y, c);
+    }
+
     public void FillRect(int x, int y, int w, int h, Color c)
     {
         int x2 = x + w;
@@ -106,6 +111,11 @@ public class PixelRenderer
             for (int j = y; j < y2; j++)
                 DrawPixel(i, j, c);
         }
+    }
+    
+    public void FillRect(Vector2 p, Vector2 s, Color c)
+    {
+        FillRect((int)p.X, (int)p.Y, (int)s.X, (int)s.Y, c);
     }
 
     public void DrawLine(int x1, int y1, int x2, int y2, Color c)

@@ -79,7 +79,7 @@ public class WaveController
         if (!m_drawWaveText) return;
 
         string text = $"Wave: {m_currentWave}";
-        GameState.Root.TextRenderer.Draw(text, new Vector2(10, 10), Palette.GetColor(Palette.Colors.Blue6), 2);
+        GameState.Root.TextRenderer.DrawString(new Vector2(10, 10), text, Palette.GetColor(Palette.Colors.Blue6), 1);
     }
 
     public void OnUpdate(UpdateEventArgs e)

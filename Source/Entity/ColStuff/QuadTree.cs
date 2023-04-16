@@ -288,9 +288,6 @@ namespace Asteroids2.Source.Entity.ColStuff
                             Vector2 x1 = entities[i].Position;
                             Vector2 x2 = m_returnObjects[x].Position;
 
-                            Vector2 e1P1 = v12;
-                            Vector2 e2P1 = v22;
-
                             int e1P2 = (2 * m22) / (m12 + m22);
                             int e2P2 = (2 * m12) / (m12 + m22);
 
@@ -300,8 +297,8 @@ namespace Asteroids2.Source.Entity.ColStuff
                             Vector2 e1P4 = x1 - x2;
                             Vector2 e2P4 = x2 - x1;
 
-                            Vector2 e1P5 = e1P1 - e1P2 * e1P3 * e1P4;
-                            Vector2 e2P5 = e2P1 - e2P2 * e2P3 * e2P4;
+                            Vector2 e1P5 = v12 - e1P2 * e1P3 * e1P4;
+                            Vector2 e2P5 = v22 - e2P2 * e2P3 * e2P4;
 
                             entities[i].Velocity = e1P5;
                             m_returnObjects[x].Velocity = e2P5;
