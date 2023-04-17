@@ -4,14 +4,9 @@ public class MainMenuState : GameState
 {
     private Buttons m_selectedButton;
 
-    private enum Buttons
-    {
-        Play, Shop, Exit
-    }
+    private enum Buttons { Play, Shop, Exit }
 
-    public MainMenuState(Game1 root) : base(root)
-    {
-    }
+    public MainMenuState(Game1 root) : base(root) { }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
@@ -21,8 +16,6 @@ public class MainMenuState : GameState
     public override void Draw()
     {
         Root.PixelRenderer.ClearSimd(Game1.BackgroundColor);
-
-        
     }
 
     public override void Enter() { }

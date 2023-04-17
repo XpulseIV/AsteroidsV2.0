@@ -17,19 +17,13 @@ public class Manager
     public void Update(PixelRenderer pr, TextRenderer tr)
     {
         // Update all controls that this manager operates
-        foreach (BaseControl control in m_vControls)
-        {
-            control.Update(pr, tr);
-        }
+        foreach (BaseControl control in m_vControls) control.Update(pr, tr);
     }
 
     public void Draw(PixelRenderer pr, TextRenderer tr)
     {
         // Draw as "sprite" all controls that this manager operates
-        foreach (BaseControl control in m_vControls)
-        {
-            control.Draw(pr, tr);
-        }
+        foreach (BaseControl control in m_vControls) control.Draw(pr, tr);
     }
 
     // Theme attributes

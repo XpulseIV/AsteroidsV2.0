@@ -77,10 +77,7 @@ public sealed class TextRenderer
 
         m_fontSpacing = new List<Vector2>();
 
-        foreach (byte c in spacing)
-        {
-            m_fontSpacing.Add(new Vector2(c >> 4, c & 15));
-        }
+        foreach (byte c in spacing) m_fontSpacing.Add(new Vector2(c >> 4, c & 15));
     }
 
     public Vector2 GetTextSize(string s)
@@ -115,7 +112,9 @@ public sealed class TextRenderer
     }
 
     public void DrawString(Vector2 pos, string sText, Color col, int scale)
-    { DrawString((int)pos.X, (int)pos.Y, sText, col, scale); }
+    {
+        DrawString((int)pos.X, (int)pos.Y, sText, col, scale);
+    }
 
     public void DrawString(int x, int y, string sText, Color col, int scale)
     {
@@ -126,12 +125,10 @@ public sealed class TextRenderer
         {
             if (c == '\n')
             {
-                sx = 0; sy += 8 * scale;
+                sx = 0;
+                sy += 8 * scale;
             }
-            else if (c == '\t')
-            {
-                sx += 8 * TabSizeInSpaces * scale;
-            }
+            else if (c == '\t') sx += 8 * TabSizeInSpaces * scale;
             else
             {
                 int ox = (c - 32) % 16;
@@ -140,18 +137,31 @@ public sealed class TextRenderer
                 if (scale > 1)
                 {
                     for (int i = 0; i < 8; i++)
+                    {
                         for (int j = 0; j < 8; j++)
+                        {
                             if (m_pixelFont[ExtensionMethods.twoDToOneD((i + ox * 8, j + oy * 8, 128))].R > 0)
+                            {
                                 for (int iss = 0; iss < scale; iss++)
+                                {
                                     for (int js = 0; js < scale; js++)
-                                        m_root.PixelRenderer.DrawPixel(x + sx + (i * scale) + iss, y + sy + (j * scale) + js, col);
+                                        m_root.PixelRenderer.DrawPixel
+                                            (x + sx + i * scale + iss, y + sy + j * scale + js, col);
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     for (int i = 0; i < 8; i++)
+                    {
                         for (int j = 0; j < 8; j++)
+                        {
                             if (m_pixelFont[ExtensionMethods.twoDToOneD((i + ox * 8, j + oy * 8, 128))].R > 0)
                                 m_root.PixelRenderer.DrawPixel(x + sx + i, y + sy + j, col);
+                        }
+                    }
                 }
 
                 sx += 8 * scale;
@@ -193,7 +203,9 @@ public sealed class TextRenderer
     }
 
     public void DrawStringProp(Vector2 pos, string sText, Color col, int scale)
-    { DrawStringProp((int)pos.X, (int)pos.Y, sText, col, scale); }
+    {
+        DrawStringProp((int)pos.X, (int)pos.Y, sText, col, scale);
+    }
 
     public void DrawStringProp(int x, int y, string sText, Color col, int scale)
     {
@@ -204,12 +216,10 @@ public sealed class TextRenderer
         {
             if (c == '\n')
             {
-                sx = 0; sy += 8 * scale;
+                sx = 0;
+                sy += 8 * scale;
             }
-            else if (c == '\t')
-            {
-                sx += 8 * TabSizeInSpaces * scale;
-            }
+            else if (c == '\t') sx += 8 * TabSizeInSpaces * scale;
             else
             {
                 int ox = (c - 32) % 16;
@@ -218,18 +228,35 @@ public sealed class TextRenderer
                 if (scale > 1)
                 {
                     for (int i = 0; i < m_fontSpacing[c - 32].Y; i++)
+                    {
                         for (int j = 0; j < 8; j++)
-                            if (m_pixelFont[ExtensionMethods.twoDToOneD(((int)(i + ox * 8 + m_fontSpacing[c - 32].X), j + oy * 8, 128))].R > 0)
+                        {
+                            if (m_pixelFont[
+                                    ExtensionMethods.twoDToOneD
+                                        (((int)(i + ox * 8 + m_fontSpacing[c - 32].X), j + oy * 8, 128))].R > 0)
+                            {
                                 for (int iss = 0; iss < scale; iss++)
+                                {
                                     for (int js = 0; js < scale; js++)
-                                        m_root.PixelRenderer.DrawPixel(x + sx + (i * scale) + iss, y + sy + (j * scale) + js, col);
+                                        m_root.PixelRenderer.DrawPixel
+                                            (x + sx + i * scale + iss, y + sy + j * scale + js, col);
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     for (int i = 0; i < m_fontSpacing[c - 32].Y; i++)
+                    {
                         for (int j = 0; j < 8; j++)
-                            if (m_pixelFont[ExtensionMethods.twoDToOneD(((int)(i + ox * 8 + m_fontSpacing[c - 32].X), j + oy * 8, 128))].R > 0)
+                        {
+                            if (m_pixelFont[
+                                    ExtensionMethods.twoDToOneD
+                                        (((int)(i + ox * 8 + m_fontSpacing[c - 32].X), j + oy * 8, 128))].R > 0)
                                 m_root.PixelRenderer.DrawPixel(x + sx + i, y + sy + j, col);
+                        }
+                    }
                 }
 
                 sx += (int)m_fontSpacing[c - 32].Y * scale;

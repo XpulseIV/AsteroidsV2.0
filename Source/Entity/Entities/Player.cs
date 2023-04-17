@@ -78,7 +78,7 @@ public class Player : Entity, IInputEventListener
 
         if (e.Keys.Contains(Keys.G))
         {
-            Random rnd = new();
+            Random rnd = new Random();
 
             int side = rnd.Next(0, 4);
 
@@ -100,7 +100,7 @@ public class Player : Entity, IInputEventListener
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            Vector2 position = new(x, y);
+            Vector2 position = new Vector2(x, y);
             Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
 
             GameState.Entities.Add(new Asteroid(GameState, position, 0, size));
@@ -160,21 +160,37 @@ public class Player : Entity, IInputEventListener
 
         if ((m_lastTimeFired + m_cannon.ShootSpeed) > timeNow) return;
 
-        var positiveRotMat = Matrix.CreateRotationZ(Rotation + 15.0f);
+        Matrix positiveRotMat = Matrix.CreateRotationZ(Rotation + 15.0f);
 
-        var cannonPos = Position + Vector2.UnitY.RotateVector(Rotation);
+        Vector2 cannonPos = Position + Vector2.UnitY.RotateVector(Rotation);
 
         GameState.Entities.Add(new Bullet(GameState, cannonPos, Rotation, BulletSpeed));
 
-        var idk = new Mk3Cannon();
+        Mk3Cannon idk = new Mk3Cannon();
 
         if (m_cannon.GetType() == idk.GetType())
         {
-            GameState.Entities.Add(new Bullet(GameState, cannonPos + Vector2.Transform(Vector2.UnitX, -positiveRotMat), Rotation, BulletSpeed));
-            GameState.Entities.Add(new Bullet(GameState, cannonPos + Vector2.Transform(Vector2.UnitX, positiveRotMat), Rotation, BulletSpeed));
+            GameState.Entities.Add
+            (
+                new Bullet
+                    (GameState, cannonPos + Vector2.Transform(Vector2.UnitX, -positiveRotMat), Rotation, BulletSpeed)
+            );
+            GameState.Entities.Add
+            (
+                new Bullet
+                    (GameState, cannonPos + Vector2.Transform(Vector2.UnitX, positiveRotMat), Rotation, BulletSpeed)
+            );
 
-            GameState.Entities.Add(new Bullet(GameState, cannonPos - Vector2.Transform(Vector2.UnitX, -positiveRotMat), Rotation, BulletSpeed));
-            GameState.Entities.Add(new Bullet(GameState, cannonPos - Vector2.Transform(Vector2.UnitX, positiveRotMat), Rotation, BulletSpeed));
+            GameState.Entities.Add
+            (
+                new Bullet
+                    (GameState, cannonPos - Vector2.Transform(Vector2.UnitX, -positiveRotMat), Rotation, BulletSpeed)
+            );
+            GameState.Entities.Add
+            (
+                new Bullet
+                    (GameState, cannonPos - Vector2.Transform(Vector2.UnitX, positiveRotMat), Rotation, BulletSpeed)
+            );
         }
 
         m_lastTimeFired = timeNow;

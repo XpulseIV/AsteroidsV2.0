@@ -39,9 +39,11 @@ public class GameplayState : GameState
         Root.TextRenderer.DrawString(0, 21, Player.m_money.ToString(), Palette.GetColor(Palette.Colors.Blue7), 1);
 
         foreach (Entity.Entity entity in Entities)
-        {
-            Root.PixelRenderer.DrawCircle((int)entity.Position.X, (int)entity.Position.Y, entity.Bounds.Width, new Color(Palette.GetColor(Palette.Colors.Green8), 0.8f), 255);
-        }
+            Root.PixelRenderer.DrawCircle
+            (
+                (int)entity.Position.X, (int)entity.Position.Y, entity.Bounds.Width,
+                new Color(Palette.GetColor(Palette.Colors.Green8), 0.8f), 255
+            );
     }
 
     public override void Enter()

@@ -5,13 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Asteroids2.Source.Upgrades.Cannons
+namespace Asteroids2.Source.Upgrades.Cannons;
+
+internal class Mk3Cannon : CannonBase
 {
-    internal class Mk3Cannon : CannonBase
+    public Mk3Cannon()
     {
-        public Mk3Cannon()
-        {
-            ShootSpeed = 25;
-        }
+        ShootSpeed = 25;
     }
 }

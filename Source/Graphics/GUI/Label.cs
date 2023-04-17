@@ -1,13 +1,9 @@
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 namespace Asteroids2.Source.Graphics.GUI;
 
-using System;
-using System.Collections.Generic;
-
 // Label Control - represents a simple text label
-class Label : BaseControl
+internal class Label : BaseControl
 {
     // Position of label
     public Vector2 vPos;
@@ -45,27 +41,19 @@ class Label : BaseControl
 
     public override void Draw(PixelRenderer pr, TextRenderer tr)
     {
-        if (!bVisible)
-        {
-            return;
-        }
+        if (!bVisible) return;
 
-        if (bHasBackground)
-        {
-            pr.FillRect(vPos + new Vector2(1, 1), vSize - new Vector2(2, 2), m_manager.colNormal);
-        }
+        if (bHasBackground) pr.FillRect(vPos + new Vector2(1, 1), vSize - new Vector2(2, 2), m_manager.colNormal);
 
-        if (bHasBorder)
-        {
-            pr.DrawRect(vPos, vSize - new Vector2(1, 1), m_manager.colBorder);
-        }
+        if (bHasBorder) pr.DrawRect(vPos, vSize - new Vector2(1, 1), m_manager.colBorder);
 
         Vector2 vText = tr.GetTextSizeProp(sText);
 
         switch (nAlign)
         {
         case Alignment.Left:
-            tr.DrawStringProp(new Vector2( vPos.X + 2.0f, vPos.Y + (vSize.Y - vText.Y) * 0.5f ), sText, m_manager.colText, 1);
+            tr.DrawStringProp
+                (new Vector2(vPos.X + 2.0f, vPos.Y + (vSize.Y - vText.Y) * 0.5f), sText, m_manager.colText, 1);
 
             break;
         case Alignment.Centre:
@@ -73,7 +61,11 @@ class Label : BaseControl
 
             break;
         case Alignment.Right:
-            tr.DrawStringProp(new Vector2( vPos.X + vSize.X - vText.X - 2.0f, vPos.Y + (vSize.Y - vText.Y) * 0.5f), sText, m_manager.colText, 1);
+            tr.DrawStringProp
+            (
+                new Vector2(vPos.X + vSize.X - vText.X - 2.0f, vPos.Y + (vSize.Y - vText.Y) * 0.5f), sText,
+                m_manager.colText, 1
+            );
 
             break;
         }

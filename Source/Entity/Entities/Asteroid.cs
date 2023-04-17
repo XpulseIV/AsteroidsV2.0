@@ -125,10 +125,7 @@ public class Asteroid : Entity
 
         Rotation += m_rotSpeed * e.DeltaTime;
 
-        if (Rotation > Math.PI)
-        {
-            Rotation = -MathF.PI;
-        }
+        if (Rotation > Math.PI) Rotation = -MathF.PI;
 
         // apply friction
         float sign = Math.Sign(Velocity.Length());

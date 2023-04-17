@@ -34,9 +34,6 @@ public static class ExtensionMethods
 
         return new Color((float)r, g, b, 255);
     }
-    
-    public static int twoDToOneD((int, int, int) hmmm)
-    {
-        return hmmm.Item1 + hmmm.Item2 * hmmm.Item3;
-    }
+
+    public static int twoDToOneD((int, int, int) hmmm) => hmmm.Item1 + hmmm.Item2 * hmmm.Item3;
 }

@@ -112,7 +112,7 @@ public class PixelRenderer
                 DrawPixel(i, j, c);
         }
     }
-    
+
     public void FillRect(Vector2 p, Vector2 s, Color c)
     {
         FillRect((int)p.X, (int)p.Y, (int)s.X, (int)s.Y, c);
