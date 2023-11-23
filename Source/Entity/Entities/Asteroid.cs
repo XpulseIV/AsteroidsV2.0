@@ -1,141 +1,171 @@
-﻿#region
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Asteroids2.Source.Game;
-using Asteroids2.Source.Game.GameState;
-using Asteroids2.Source.Graphics;
-using Asteroids2.Source.Utilities;
 using Microsoft.Xna.Framework;
-#endregion
+using Microsoft.Xna.Framework.Graphics;
 
-namespace Asteroids2.Source.Entity.Entities;
+namespace AstralAssault;
 
 public class Asteroid : Entity
 {
-    public enum Sizes { Smallest, Small, Medium }
-    private readonly float m_rotSpeed;
-    private readonly Sizes m_size;
-    private bool m_hasExploded;
+    private readonly Single _rotSpeed;
+    private readonly Sizes _size;
+    private Boolean _hasExploded;
+
+    public enum Sizes
+    {
+        Smallest,
+        Small,
+        Medium
+    }
 
     public Asteroid(
         GameplayState gameState,
         Vector2 position,
-        float direction,
+        Single direction,
         Sizes size)
-        : base(gameState, position)
+        :base(gameState, position)
     {
-        m_size = size;
+        this._size = size;
+        this.size = ((Int32)this._size + 1) * 4;
 
-        this.size = ((int)m_size + 1) * 4;
+        this.Color = Palette.GetColor(Palette.Colors.Red6);
+        this.model = new List<Vector2>();
+        
+        Bounds = new Rectangle((int)position.X, (int)position.Y, ((int)_size + 1) * 4 + 2, ((int)_size + 1) * 4 + 2);
 
-        const int verts = 20;
-
-        model = new List<Vector2>();
-
-        Bounds = new Rectangle((int)position.X, (int)position.Y, ((int)m_size + 1) * 4 + 2, ((int)m_size + 1) * 4 + 2);
-
-        Color = Palette.GetColor(Palette.Colors.Red6);
-
-        for (int i = 0; i < verts; i++)
+        const Int32 verts = 20;
+        for (Int32 i = 0; i < verts; i++)
         {
-            float noise = (float)new Random().NextDouble() * 0.4f + 0.8f;
-            model.Add
+            Single noise = (Single)new Random().NextDouble() * 0.4f + 0.8f;
+            this.model.Add
             (
                 new Vector2
                 (
-                    noise * MathF.Sin(i / (float)verts * 6.28318f),
-                    noise * MathF.Cos(i / (float)verts * 6.28318f)
+                    noise * MathF.Sin(i / (Single)verts * 6.28318f),
+                    noise * MathF.Cos(i / (Single)verts * 6.28318f)
                 )
             );
         }
 
-        Random rnd = new Random();
-        m_rotSpeed = rnd.Next(5, 20) / 10F;
-        int speed = rnd.Next(30, 100);
+        Random rnd = new();
+        this._rotSpeed = rnd.Next(5, 20) / 10F;
+        Int32 speed = rnd.Next(30, 100);
 
-        Velocity = Vector2.UnitX.RotateVector(direction) * speed;
+        this.Velocity = new Vector2((Single)Math.Cos(direction), (Single)Math.Sin(direction)) * speed;
 
         switch (size)
         {
-        case Sizes.Smallest:
-            MaxHP = 12;
-            HP = MaxHP;
-            ContactDamage = 5;
-            Mass = 6;
-
-            break;
-
-        case Sizes.Small:
-            MaxHP = 24;
-            HP = MaxHP;
-            ContactDamage = 7;
-            Mass = 12;
-
-            break;
-
-        case Sizes.Medium:
-            MaxHP = 36;
-            HP = MaxHP;
-            ContactDamage = 12;
-            Mass = 18;
-
-            break;
-
-        default:
-            throw new ArgumentOutOfRangeException();
+            case Sizes.Smallest:
+                this.MaxHP = 12;
+                this.HP = this.MaxHP;
+                this.ContactDamage = 5;
+                mass = 6;
+                break;
+            case Sizes.Small:
+                this.MaxHP = 24;
+                this.HP = this.MaxHP;
+                this.ContactDamage = 7;
+                mass = 12;
+                break;
+            case Sizes.Medium:
+                this.MaxHP = 36;
+                this.HP = this.MaxHP;
+                this.ContactDamage = 12;
+                mass = 18;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
 
-        OutOfBoundsBehavior = OutOfBounds.Wrap;
+        this.OutOfBoundsBehavior = OutOfBounds.Wrap;
 
-        IsActor = true;
-        IsSolid = true;
+        this.IsActor = true;
+        this.IsSolid = true;
     }
 
     protected override void OnDeath()
     {
-        if (!m_hasExploded && ((m_size - 1) >= 0))
+        if (!this._hasExploded)
         {
-            Random rnd = new Random();
-            int amount = rnd.Next(1, 4);
+            Random rnd = new();
 
-            Vector2 playerPosition = GameState.Player.Position;
-            float angleToPlayer = MathF.Atan2(Position.Y - playerPosition.Y, Position.X - playerPosition.X);
-
-            for (int i = 0; i < amount; i++)
+            String soundToPlay = rnd.Next(3) switch
             {
-                angleToPlayer += (float)rnd.NextDouble() * MathF.PI / 1 - MathF.PI / 2;
+                0 => "Explosion1",
+                1 => "Explosion2",
+                2 => "Explosion3",
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
-                GameState.Entities.Add
-                (
-                    new Asteroid(GameState, Position, angleToPlayer, m_size - 1)
-                );
+            Jukebox.PlaySound(soundToPlay);
+
+            if (this._size - 1 < 0)
+            {
+                this._hasExploded = true;
+                return;
+            }
+
+            Int32 amount = rnd.Next(1, 4);
+
+            Vector2 playerPosition = this.GameState.Player.Position;
+            Single angleToPlayer = MathF.Atan2(this.Position.Y - playerPosition.Y, this.Position.X - playerPosition.X);
+
+            for (Int32 i = 0; i < amount; i++)
+            {
+                angleToPlayer += (Single)rnd.NextDouble() * MathF.PI / 1 - MathF.PI / 2;
+
+                this.GameState.Entities.Add(
+                    new Asteroid(this.GameState, this.Position, angleToPlayer, this._size - 1));
             }
         }
 
-        m_hasExploded = true;
+        this._hasExploded = true;
 
-        GameState.Player.m_money += 50;
+        this.GameState.Player.Multiplier += 0.1F;
+
+        Int32 score = this._size switch
+        {
+            Sizes.Smallest => 100,
+            Sizes.Small => 300,
+            Sizes.Medium => 700,
+            _ => 0
+        };
+
+        this.GameState.DebrisController.SpawnDebris(this.Position, (Int32)this._size);
+        this.GameState.DebrisController.SpawnScoreText(this.Position, score);
+
+        this.GameState.Root.Score += (Int32)(score * this.GameState.Player.Multiplier);
+
+        this.GameState.EnemySpawner.EnemiesKilled++;
 
         base.OnDeath();
     }
 
-    public override void OnUpdate(UpdateEventArgs e)
+    public override void Update(float deltaTime)
     {
-        base.OnUpdate(e);
+        base.Update(deltaTime);
 
-        Rotation += m_rotSpeed * e.DeltaTime;
-
-        if (Rotation > Math.PI) Rotation = -MathF.PI;
-
-        // apply friction
-        float sign = Math.Sign(Velocity.Length());
-
-        if (sign != 0)
-        {
-            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
-
-            Velocity -=
-                Vector2.UnitX.RotateVector(direction) * 5 * e.DeltaTime * sign;
+        this.Rotation += this._rotSpeed * deltaTime;
+        if (this.Rotation > Math.PI) {
+            this.Rotation = (Single)(-Math.PI);
         }
+
+        if (this.Velocity.Length() > 200)
+        {
+            this.Velocity = Vector2.Normalize(this.Velocity) * 200;
+        }
+    }
+
+    public override void OnCollision(Entity other)
+    {
+        base.OnCollision(other);
+
+        if (other is not Bullet) return;
+
+        Random rnd = new();
+
+        String soundName = "Hurt" + rnd.Next(1, 4);
+
+        Jukebox.PlaySound(soundName, 0.5F);
     }
 }

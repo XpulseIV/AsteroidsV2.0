@@ -1,3 +1,6 @@
-﻿namespace Asteroids2.Source.Input;
+﻿namespace AstralAssault;
 
-public interface IInputEventListener : IKeyboardEventListener, IMouseEventListener { }
+public interface IInputEventListener : IKeyboardEventListener, IMouseEventListener
+{
+
+}

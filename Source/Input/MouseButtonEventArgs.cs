@@ -1,16 +1,14 @@
-﻿#region
-using System;
-using static Asteroids2.Source.Input.InputEventSource;
-#endregion
+﻿using System;
+using static AstralAssault.InputEventSource;
 
-namespace Asteroids2.Source.Input;
+namespace AstralAssault;
 
 public class MouseButtonEventArgs : EventArgs
 {
+    public MouseButtons Button { get; }
+
     public MouseButtonEventArgs(MouseButtons button)
     {
-        Button = button;
+        this.Button = button;
     }
-
-    public MouseButtons Button { get; }
 }

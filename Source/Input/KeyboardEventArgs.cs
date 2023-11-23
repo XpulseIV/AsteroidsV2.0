@@ -1,16 +1,15 @@
-﻿#region
-using System;
+﻿using System;
 using Microsoft.Xna.Framework.Input;
-#endregion
 
-namespace Asteroids2.Source.Input;
+namespace AstralAssault;
 
 public class KeyboardEventArgs : EventArgs
 {
-    public KeyboardEventArgs(Keys[] keys)
-    {
-        Keys = keys;
-    }
-
     public Keys[] Keys { get; }
+    public Single DeltaTime;
+
+    public KeyboardEventArgs(Keys[] keys, Single deltaTime) {
+        this.Keys = keys;
+        this.DeltaTime = deltaTime;
+    }
 }

@@ -1,78 +1,126 @@
-﻿#region
-using System;
-using Asteroids2.Source.Graphics;
-using Asteroids2.Source.Graphics.GUI;
-using Asteroids2.Source.Input;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
-#endregion
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
-namespace Asteroids2.Source.Game.GameState;
+namespace AstralAssault;
 
 public class GameOverState : GameState, IKeyboardPressedEventListener
 {
-    private Manager m_manager;
+    private readonly Boolean _newHighScore;
+    private readonly Int64 _timeEntered;
+    private Texture2D _gameOverText;
+    private Texture2D _restartPrompt;
+    private Boolean _showNewHighScore;
+    private Int64 _lastToggle;
 
-    private Label l;
+    public GameOverState(Game1 root) : base(root) {
+        InputEventSource.KeyboardPressedEvent += this.OnKeyboardPressedEvent;
+        this._timeEntered = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-    public GameOverState(Game1 root) : base(root)
-    {
-        InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
-        m_manager = new Manager();
-        l = new Label(m_manager, "lllasdasdasdasdasdasdasd", new Vector2(32, 32), new Vector2(17, 17));
+        if (this.Root.Score <= this.Root.HighScore) return;
 
-        l.bHasBorder = true;
+        this.Root.HighScore = this.Root.Score;
+        this._newHighScore = true;
     }
 
-    public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
-    {
-        Root.GameStateMachine.ChangeState(new GameplayState(Root));
+    public override void Enter() {
+        this._gameOverText = AssetManager.Load<Texture2D>("GameOver");
+        this._restartPrompt = AssetManager.Load<Texture2D>("Restart");
     }
 
-    public override void Draw()
+    public override void Exit() {
+        InputEventSource.KeyboardPressedEvent -= this.OnKeyboardPressedEvent;
+    }
+    
+    public override List<DrawTask> GetDrawTasks()
     {
-        Root.PixelRenderer.ClearSimd(Game1.BackgroundColor);
+        Vector2 textPosition = new(
+            (Single)Math.Round(Game1.TargetWidth / 2D),
+            (Single)Math.Round(Game1.TargetHeight / 3D));
+        
+        Vector2 promptPosition = new(
+            (Single)Math.Round(Game1.TargetWidth / 2D),
+            (Single)Math.Round(Game1.TargetHeight / 2D));
 
-        Vector2 textPosition = new Vector2
-        (
-            MathF.Round(Game1.TargetWidth / 2f),
-            MathF.Round(Game1.TargetHeight / 3f)
-        );
+        List<DrawTask> drawTasks = new();
+        
+        DrawTask gameOverText = new(this._gameOverText,
+            textPosition,
+            0,
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect>());
 
-        Vector2 promptPosition = new Vector2
-        (
-            (float)Math.Round(Game1.TargetWidth / 2f),
-            (float)Math.Round(Game1.TargetHeight / 2f)
-        );
+        drawTasks.Add(gameOverText);
+        
+        Int64 timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
+        if (timeNow - this._timeEntered > 1000)
+        {
+            DrawTask restartPrompt = new(this._restartPrompt,
+                promptPosition,
+                0,
+                LayerDepth.HUD,
+                new List<IDrawTaskEffect>());
 
-        const string gameOverString = "Game Over";
-        const string restartString = "Press any key to continue!";
+            drawTasks.Add(restartPrompt);
+        }
 
-        int gOsLenght = (int)Root.TextRenderer.GetTextSize(gameOverString).X;
-        int rsLenght = (int)Root.TextRenderer.GetTextSize(restartString).X;
+        Int32 score = (Int32)this.Lerp(0, this.Root.Score, MathF.Min((timeNow - this._timeEntered) / 800F, 1));
+        String scoreText = $"Score: {score}";
+        Int32 textX = 240 - $"Score: {this.Root.Score}".Length * 4;
+        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(textX, 150), Color.White, LayerDepth.HUD);
+        drawTasks.AddRange(scoreTasks);
 
-        Root.TextRenderer.DrawString
-        (
-            (int)textPosition.X - gOsLenght, (int)textPosition.Y, gameOverString,
-            Palette.GetColor(Palette.Colors.Grey9), 2
-        );
-        Root.TextRenderer.DrawString
-        (
-            (int)promptPosition.X - rsLenght / 2, (int)promptPosition.Y, restartString,
-            Palette.GetColor(Palette.Colors.Grey9), 1
-        );
+        if (!this._newHighScore)
+        {
+            String highScoreText = $"High score: {this.Root.HighScore}";
+            Int32 highScoreX = 240 - highScoreText.Length * 4;
+            List<DrawTask> highScoreTasks =
+                highScoreText.CreateDrawTasks(new Vector2(highScoreX, 170), Color.White, LayerDepth.HUD);
+            drawTasks.AddRange(highScoreTasks);
 
-        m_manager.Draw(Root.PixelRenderer, Root.TextRenderer);
+            return drawTasks;
+        }
+
+        Int64 timeSinceToggle = timeNow - this._lastToggle;
+        if (timeSinceToggle > 500)
+        {
+            this._showNewHighScore = !this._showNewHighScore;
+            this._lastToggle = timeNow;
+        }
+        
+        if (!this._showNewHighScore) return drawTasks;
+
+        String newHighScoreText = "New high score!";
+        Int32 newHighScoreX = 240 - newHighScoreText.Length * 4;
+        List<DrawTask> newHighScoreTasks =
+            newHighScoreText.CreateDrawTasks(new Vector2(newHighScoreX, 170), Color.White, LayerDepth.HUD);
+        drawTasks.AddRange(newHighScoreTasks);
+
+        return drawTasks;
     }
 
-    public override void Enter() { }
+    public override void Update(Single deltaTime) { }
 
-    public override void Exit()
+    public void OnKeyboardPressedEvent(Object sender, KeyboardEventArgs e)
     {
-        InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
+        if (e.Keys.Contains(Keys.F)) return;
+        
+        Int64 timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        if (timeNow - this._timeEntered < 1000)
+        {
+            return;
+        }
+        
+        Jukebox.PlaySound("RestartGame");
+        this.Root.GameStateMachine.ChangeState(new GameplayState(this.Root));
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    private Single Lerp(Single firstFloat, Single secondFloat, Single by)
     {
-        m_manager.Update(Root.PixelRenderer, Root.TextRenderer);
+        return firstFloat * (1 - by) + secondFloat * by;
     }
 }

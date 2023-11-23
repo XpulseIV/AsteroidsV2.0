@@ -1,18 +1,13 @@
-﻿#region
-using System;
-using Microsoft.Xna.Framework;
-#endregion
+﻿using System;
 
-namespace Asteroids2.Source.Game;
+namespace AstralAssault;
 
 public class UpdateEventArgs : EventArgs
 {
-    public UpdateEventArgs(float deltaTime, GameTime gt)
+    public float DeltaTime { get; }
+
+    public UpdateEventArgs(float deltaTime)
     {
         DeltaTime = deltaTime;
-        Gt = gt;
     }
-
-    public float DeltaTime { get; }
-    public GameTime Gt { get; }
 }

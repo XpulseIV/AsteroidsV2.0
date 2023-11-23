@@ -1,6 +1,8 @@
-﻿namespace Asteroids2.Source.Input;
+﻿using System;
+
+namespace AstralAssault;
 
 public interface IKeyboardEventListener
 {
-    void OnKeyboardEvent(object sender, KeyboardEventArgs e);
+    void OnKeyboardEvent(Object sender, KeyboardEventArgs e);
 }

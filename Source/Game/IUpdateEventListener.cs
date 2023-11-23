@@ -1,6 +1,6 @@
-﻿namespace Asteroids2.Source.Game;
+﻿namespace AstralAssault;
 
 public interface IUpdateEventListener
 {
-    void OnUpdate(object sender, UpdateEventArgs e);
+    void Update(object sender, UpdateEventArgs e);
 }

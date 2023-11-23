@@ -1,156 +1,197 @@
-﻿#region
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Asteroids2.Source.Game;
-using Asteroids2.Source.Game.GameState;
-using Asteroids2.Source.Graphics;
+using System.Diagnostics;
+using AstralAssault.Source.Entity.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
-using MonoGame.Extended.Collisions;
-#endregion
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector4 = Microsoft.Xna.Framework.Vector4;
 
-namespace Asteroids2.Source.Entity;
+namespace AstralAssault;
 
 public class Entity
 {
-    protected readonly GameplayState GameState;
-
-    private readonly long m_timeSpawned;
-    protected Color Color;
-    protected float ContactDamage;
-    protected float HP;
-    protected bool IsActor = false;
-
-    public bool IsFriendly;
-
-    private Texture2D m_healthBarTexture;
-    protected float MaxHP;
-
-    public List<Vector2> model;
-    protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
     public Vector2 Position;
-    protected float Rotation;
-
-    protected int size;
     public Vector2 Velocity;
+    protected Single ContactDamage;
+    protected Single Rotation;
+    public List<Vector2> model;
+    protected Color Color;
+    protected Int32 size;
+    protected readonly GameplayState GameState;
+    protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
+    protected Boolean IsActor = false;
+    protected Single MaxHP;
+    protected Single HP;
+    protected Int32 HealthBarYOffset = 20;
 
-    public const float MaxSpeed = 100;
+    public bool IsSolid;
+    public int mass;
 
     public Rectangle Bounds;
 
-    public bool IsSolid;
-    public int Mass;
+    public Boolean IsFriendly;
 
-    protected Entity(GameplayState gameState, Vector2 position)
+    private readonly Int64 _timeSpawned;
+    public Int64 TimeSinceSpawned => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - this._timeSpawned;
+
+    private Texture2D _healthBarTexture;
+
+    protected enum OutOfBounds
     {
-        GameState = gameState;
-        Position = position;
-        m_timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        DoNothing,
+        Wrap,
+        Destroy
     }
 
-    public long TimeSinceSpawned
-    {
-        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
+    protected Entity(GameplayState gameState, Vector2 position) {
+        this.GameState = gameState;
+        this.Position = position;
+        this._timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+
+        this.CreateHealthBarTexture();
     }
 
-    public virtual void OnUpdate(UpdateEventArgs e)
+    public virtual void Update(float deltaTime)
     {
-        Bounds.X = (int)(Position.X - Bounds.Width / 2f);
-        Bounds.Y = (int)(Position.Y - Bounds.Height / 2f);
-
-        if (IsActor && (HP <= 0))
+        if (this.IsActor && this.HP <= 0)
         {
-            OnDeath();
-
+            this.OnDeath();
             return;
         }
 
-        Position += Velocity * e.DeltaTime;
+        this.Position += this.Velocity * deltaTime;
 
-        switch (OutOfBoundsBehavior)
+        switch (this.OutOfBoundsBehavior)
         {
-        case OutOfBounds.DoNothing:
-        {
-            break;
-        }
-
-        case OutOfBounds.Destroy:
-        {
-            if (Position.X is < 0 or > Game1.TargetWidth ||
-                Position.Y is < 0 or > Game1.TargetHeight) Destroy();
-
-            break;
-        }
-
-        case OutOfBounds.Wrap:
-        {
-            Position.X = Position.X switch
+            case OutOfBounds.DoNothing:
             {
-                < 0 => Game1.TargetWidth,
-                > Game1.TargetWidth => 0,
-                var _ => Position.X
-            };
+                break;
+            }
 
-            Position.Y = Position.Y switch
+            case OutOfBounds.Destroy:
             {
-                < 0 => Game1.TargetHeight,
-                > Game1.TargetHeight => 0,
-                var _ => Position.Y
-            };
+                if (this.Position.X is < 0 or > Game1.TargetWidth || this.Position.Y is < 0 or > Game1.TargetHeight)
+                {
+                    this.Destroy();
+                }
 
-            break;
-        }
+                break;
+            }
 
-        default:
-        {
-            throw new ArgumentOutOfRangeException();
-        }
+            case OutOfBounds.Wrap:
+            {
+                this.Position.X = this.Position.X switch
+                {
+                    < 0 => Game1.TargetWidth,
+                    > Game1.TargetWidth => 0,
+                    _ => this.Position.X
+                };
+
+                this.Position.Y = this.Position.Y switch
+                {
+                    < 0 => Game1.TargetHeight,
+                    > Game1.TargetHeight => 0,
+                    _ => this.Position.Y
+                };
+
+                break;
+            }
+
+            default:
+            {
+                throw new ArgumentOutOfRangeException();
+            }
         }
     }
 
-    public virtual void Draw()
+    public virtual void OnCollision(Entity other)
     {
-        GameState.Root.PixelRenderer.DrawWireFrameModel(model, Position.X, Position.Y, Rotation, size, Color);
+        if (!this.IsActor || other.IsFriendly == this.IsFriendly) return;
 
-        if (IsActor) DrawHealthBar();
+        if (this is Player)
+        {
+            Player player = (Player)this;
+            player.HandleDamage(other.ContactDamage);
+        }
+        else
+        {
+            this.HP = Math.Max(0, this.HP - other.ContactDamage);
+        }
+    }
+
+    public virtual List<DrawTask> GetDrawTasks()
+    {
+        List<DrawTask> drawTasks = new();
+
+        Vector4 fullColor = Palette.GetColorVector(Palette.Colors.Green7);
+        if (this.IsActor) drawTasks.AddRange(this.CreateBarDrawTasks(this.HP, this.MaxHP, fullColor, this.HealthBarYOffset));
+
+        this.GameState.Root.Renderer.DrawWireFrameModel(this.model, this.Position.X, this.Position.Y, this.Rotation, this.size, this.Color);
+
+        return drawTasks;
     }
 
     public virtual void Destroy()
     {
-        GameState.Entities.Remove(this);
+        this.GameState.Entities.Remove(this);
     }
 
     protected virtual void OnDeath()
     {
-        Destroy();
+        this.Destroy();
     }
 
-    private void DrawHealthBar()
+    private void CreateHealthBarTexture()
     {
-        const int width = 20;
-        const int height = 3;
-
-        int filled = (int)Math.Ceiling(HP / MaxHP * width);
-
-        int x = (int)Position.X - width / 2;
-        int y = (int)Position.Y - 20;
-
-        Color outlineColor = Palette.GetColor(Palette.Colors.Black);
-        Color emptyColor = Palette.GetColor(Palette.Colors.Red6);
-        Color filledColor = Palette.GetColor(Palette.Colors.Green7);
-
-        GameState.Root.PixelRenderer.DrawRect(x - 1, y - 1, width + 1, height + 1, outlineColor); // Outline
-        GameState.Root.PixelRenderer.FillRect(x, y, width, height, emptyColor); // Empty
-        GameState.Root.PixelRenderer.FillRect(x, y, filled, height, filledColor); // Filled
+        this._healthBarTexture = new Texture2D(this.GameState.Root.GraphicsDevice, 1, 1);
+        Color[] data = { Color.White };
+        this._healthBarTexture.SetData(data);
     }
 
-    protected enum OutOfBounds { DoNothing, Wrap, Destroy }
-
-    public virtual void OnCollision(Entity other)
+    protected List<DrawTask> CreateBarDrawTasks(Single value, Single maxValue, Vector4 fillColor, Int32 yOffset)
     {
-        if (!IsActor || (other.IsFriendly == IsFriendly)) return;
+        const Int32 width = 20;
+        const Int32 height = 3;
 
-        HP = Math.Max(0, HP - other.ContactDamage);
+        Int32 filled = (Int32)Math.Ceiling(value / maxValue * width);
+
+        Int32 x = (Int32)this.Position.X - width / 2;
+        Int32 y = (Int32)this.Position.Y - yOffset;
+
+        Rectangle outline = new(x - 1, y - 1, width + 2, height + 2);
+        Rectangle emptyHealthBar = new(x, y, width, height);
+        Rectangle fullHealthBar = new(x, y, filled, height);
+
+        Vector4 outlineColor = Palette.GetColorVector(Palette.Colors.Black);
+        Vector4 emptyColor = Palette.GetColorVector(Palette.Colors.Red6);
+
+        Rectangle source = new(0, 0, 1, 1);
+
+        DrawTask background = new(this._healthBarTexture,
+            source,
+            outline,
+            0,
+            LayerDepth.HealthBar,
+            new List<IDrawTaskEffect> { new ColorEffect(outlineColor) },
+            Color.Black);
+
+        DrawTask empty = new(this._healthBarTexture,
+            source,
+            emptyHealthBar,
+            0,
+            LayerDepth.HealthBar,
+            new List<IDrawTaskEffect> { new ColorEffect(emptyColor) },
+            Color.Red);
+
+        DrawTask full = new(this._healthBarTexture,
+            source,
+            fullHealthBar,
+            0,
+            LayerDepth.HealthBar,
+            new List<IDrawTaskEffect> { new ColorEffect(fillColor) },
+            Color.LimeGreen);
+
+        return new List<DrawTask> { background, empty, full };
     }
 }

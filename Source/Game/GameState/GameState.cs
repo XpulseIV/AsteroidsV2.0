@@ -1,17 +1,18 @@
-﻿namespace Asteroids2.Source.Game.GameState;
+﻿using System.Collections.Generic;
 
-public abstract class GameState : IUpdateEventListener
+namespace AstralAssault;
+
+public abstract class GameState
 {
     public readonly Game1 Root;
 
     public GameState(Game1 root)
     {
-        Root = root;
+        this.Root = root;
     }
 
-    public abstract void OnUpdate(object sender, UpdateEventArgs e);
-
-    public abstract void Draw();
     public abstract void Enter();
     public abstract void Exit();
+    public abstract void Update(float deltaTime);
+    public abstract List<DrawTask> GetDrawTasks();
 }

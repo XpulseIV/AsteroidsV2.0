@@ -1,68 +1,104 @@
-﻿#region
+﻿using System;
 using System.Collections.Generic;
-using Asteroids2.Source.Entity.Entities;
-using Asteroids2.Source.Graphics;
+using System.Globalization;
+using System.Linq;
+using AstralAssault.Source.Entity.Entities;
 using Microsoft.Xna.Framework;
-using Quadtree = Asteroids2.Source.Entity.ColStuff.QuadTree;
-#endregion
 
-namespace Asteroids2.Source.Game.GameState;
+namespace AstralAssault;
 
 public class GameplayState : GameState
 {
-    public readonly List<Entity.Entity> Entities;
-    public WaveController WaveController;
-    public readonly Quadtree QuadTree;
+    public readonly List<Entity> Entities;
+    public EnemySpawner EnemySpawner;
+    public readonly QuadTree QuadTree;
 
-    public GameplayState(Game1 root) : base(root)
-    {
-        Entities = new List<Entity.Entity>();
-        WaveController = new WaveController(this, Root);
+    public Player Player => (Player)this.Entities.Find(entity => entity is Player);
+    public Int32 EnemiesAlive => this.Entities.Count(entity => entity is not Source.Entity.Entities.Player);
 
-        QuadTree = new Quadtree(0, new Rectangle(0, 0, Game1.TargetWidth, Game1.TargetWidth));
+    private static readonly Vector4 MultiplierBrokenColor = new(1, 0, 0, 1);
+    private static readonly Vector4 MultiplierIncreaseColor = new(1, 1, 0, 1);
+    private static readonly Vector4 MultiplierDefaultColor = new(1, 1, 1, 1);
+    private Vector4 _multiplierColor = MultiplierDefaultColor;
+    private Single _prevMultiplier = 1;
+
+    public readonly DebrisController DebrisController;
+    public readonly ExplosionController ExplosionController = new();
+
+    public GameplayState(Game1 root) : base(root) {
+        this.Entities = new List<Entity>();
+        this.EnemySpawner = new EnemySpawner(this);
+        this.DebrisController = new DebrisController(this);
+
+        QuadTree = new QuadTree(0, new Rectangle(0, 0, Game1.TargetWidth, Game1.TargetHeight), this);
     }
 
-    public Player Player
-    {
-        get => (Player)Entities.Find(static entity => entity is Player);
+    public override void Enter() {
+        this.Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
+        this.Root.Score = 0;
     }
 
-    public override void Draw()
-    {
-        Root.PixelRenderer.ClearSimd(Game1.BackgroundColor);
-
-        foreach (Entity.Entity entity in Entities) entity.Draw();
-        WaveController.Draw();
-
-        if (!Root.ShowDebug) return;
-
-        Root.TextRenderer.DrawString(0, 21, Player.m_money.ToString(), Palette.GetColor(Palette.Colors.Blue7), 1);
-
-        foreach (Entity.Entity entity in Entities)
-            Root.PixelRenderer.DrawCircle
-            (
-                (int)entity.Position.X, (int)entity.Position.Y, entity.Bounds.Width,
-                new Color(Palette.GetColor(Palette.Colors.Green8), 0.8f), 255
-            );
+    public override void Exit() {
+        this.EnemySpawner.StopListening();
+        while (this.Entities.Count > 0) this.Entities[0].Destroy();
     }
 
-    public override void Enter()
-    {
-        Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
-        UpdateEventSource.UpdateEvent += OnUpdate;
+    public override void Update(float deltaTime) {
+        if (this.Player == null) return;
+
+        Single multiplier = this.Player.Multiplier;
+
+        if (multiplier != this._prevMultiplier) {
+            this._multiplierColor = multiplier > this._prevMultiplier ? MultiplierIncreaseColor : MultiplierBrokenColor;
+            this._prevMultiplier = multiplier;
+        }
+        else {
+            this._multiplierColor = Vector4.Lerp(this._multiplierColor, MultiplierDefaultColor, deltaTime * 2);
+        }
+        
+        for (int i = 0; i < Entities.Count; i++) Entities[i].Update(deltaTime);
+
+        this.QuadTree.Update(deltaTime);
+        this.EnemySpawner.Update(deltaTime);
+        
     }
 
-    public override void Exit()
+    public override List<DrawTask> GetDrawTasks()
     {
-        while (Entities.Count > 0) Entities[0].Destroy();
-        UpdateEventSource.UpdateEvent -= OnUpdate;
+        List<DrawTask> drawTasks = new();
+        
+        foreach (Entity entity in this.Entities)
+        {
+            drawTasks.AddRange(entity.GetDrawTasks());
+        }
+
+        drawTasks.AddRange(this.DebrisController.GetDrawTasks());
+        drawTasks.AddRange(this.ExplosionController.GetDrawTasks());
+        drawTasks.AddRange(this.GetScoreDrawTasks());
+
+        this.QuadTree.Draw(this.Root);
+
+        return drawTasks;
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
-    {
-        for (int i = 0; i < Entities.Count; i++) Entities[i].OnUpdate(e);
+    private List<DrawTask> GetScoreDrawTasks() {
+        List<DrawTask> drawTasks = new();
 
-        QuadTree.Update(e.Gt, Entities);
-        WaveController.OnUpdate(e);
+        String scoreText = $"Score: {this.Root.Score}";
+        Color textColor = Palette.GetColor(Palette.Colors.Grey9);
+        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(4, 4), textColor, LayerDepth.HUD);
+        drawTasks.AddRange(scoreTasks);
+
+        String multiplierText =
+            $"Score multi.: X{this.Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
+
+        List<DrawTask> multiplierTasks = multiplierText.CreateDrawTasks(
+            new Vector2(480 - multiplierText.Length * 8 - 4, 4),
+            textColor,
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(this._multiplierColor) });
+        drawTasks.AddRange(multiplierTasks);
+
+        return drawTasks;
     }
 }

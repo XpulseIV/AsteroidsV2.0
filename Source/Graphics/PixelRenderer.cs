@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
-using Asteroids2.Source.Game;
-using Asteroids2.Source.Utilities;
+using AstralAssault;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -15,53 +14,47 @@ public class PixelRenderer
 {
     public readonly Color[] m_pixelData;
 
-    private readonly int m_width;
-    private readonly int m_height;
-
     private readonly Game1 m_root;
 
     private readonly Texture2D m_screenTexture;
 
-    public PixelRenderer(Game1 root, int width, int height)
+    public PixelRenderer(Game1 root, Int32 width, Int32 height)
     {
-        m_width = width;
-        m_height = height;
+        this.m_root = root;
+        this.m_screenTexture = new Texture2D(this.m_root.GraphicsDevice, width, height);
 
-        m_root = root;
-        m_screenTexture = new Texture2D(m_root.GraphicsDevice, width, height);
-
-        m_pixelData = new Color[width * height];
+        this.m_pixelData = new Color[width * height];
     }
 
     internal Texture2D GetPixelScreen()
     {
-        m_screenTexture.SetData(m_pixelData);
+        this.m_screenTexture.SetData(this.m_pixelData);
 
-        return m_screenTexture;
+        return this.m_screenTexture;
     }
 
-    public void DrawCircle(int x, int y, int radius, Color c, byte mask)
+    public void DrawCircle(Int32 x, Int32 y, Int32 radius, Color c, Byte mask)
     {
         if (radius > 0)
         {
-            int x0 = 0;
-            int y0 = radius;
-            int d = 3 - 2 * radius;
+            Int32 x0 = 0;
+            Int32 y0 = radius;
+            Int32 d = 3 - 2 * radius;
 
             while (y0 >= x0) // only formulate 1/8 of circle
             {
                 // Draw even octants
-                if ((mask & 0x01) != 0) DrawPixel(x + x0, y - y0, c); // Q6 - upper right right
-                if ((mask & 0x04) != 0) DrawPixel(x + y0, y + x0, c); // Q4 - lower lower right
-                if ((mask & 0x10) != 0) DrawPixel(x - x0, y + y0, c); // Q2 - lower left left
-                if ((mask & 0x40) != 0) DrawPixel(x - y0, y - x0, c); // Q0 - upper upper left
+                if ((mask & 0x01) != 0) this.DrawPixel(x + x0, y - y0, c); // Q6 - upper right right
+                if ((mask & 0x04) != 0) this.DrawPixel(x + y0, y + x0, c); // Q4 - lower lower right
+                if ((mask & 0x10) != 0) this.DrawPixel(x - x0, y + y0, c); // Q2 - lower left left
+                if ((mask & 0x40) != 0) this.DrawPixel(x - y0, y - x0, c); // Q0 - upper upper left
 
                 if ((x0 != 0) && (x0 != y0))
                 {
-                    if ((mask & 0x02) != 0) DrawPixel(x + y0, y - x0, c); // Q7 - upper upper right
-                    if ((mask & 0x08) != 0) DrawPixel(x + x0, y + y0, c); // Q5 - lower right right
-                    if ((mask & 0x20) != 0) DrawPixel(x - y0, y + x0, c); // Q3 - lower lower left
-                    if ((mask & 0x80) != 0) DrawPixel(x - x0, y - y0, c); // Q1 - upper left left
+                    if ((mask & 0x02) != 0) this.DrawPixel(x + y0, y - x0, c); // Q7 - upper upper right
+                    if ((mask & 0x08) != 0) this.DrawPixel(x + x0, y + y0, c); // Q5 - lower right right
+                    if ((mask & 0x20) != 0) this.DrawPixel(x - y0, y + x0, c); // Q3 - lower lower left
+                    if ((mask & 0x80) != 0) this.DrawPixel(x - x0, y - y0, c); // Q1 - upper left left
                 }
 
                 if (d < 0) d += 4 * x0++ + 6;
@@ -69,58 +62,58 @@ public class PixelRenderer
             }
         }
         else
-            DrawPixel(x, y, c);
+            this.DrawPixel(x, y, c);
     }
 
-    public void DrawPixel(int x, int y, Color color)
+    public void DrawPixel(Int32 x, Int32 y, Color color)
     {
-        Vector2 wrapedCoords = new Vector2(x, y).Wrap(m_width, m_height);
+        Vector2 wrapedCoords = new Vector2(x, y).Wrap(Game1.TargetWidth, Game1.TargetHeight);
 
-        x = (int)wrapedCoords.X;
-        y = (int)wrapedCoords.Y;
+        x = (Int32)wrapedCoords.X;
+        y = (Int32)wrapedCoords.Y;
 
-        int index = y * m_screenTexture.Width + x;
-        m_pixelData[index] = color;
+        Int32 index = y * this.m_screenTexture.Width + x;
+
+        this.m_pixelData[index] = color;
     }
 
     public void DrawPixel(Vector2 pos, Color color)
     {
-        DrawPixel((int)pos.X, (int)pos.Y, color);
+        this.DrawPixel((Int32)pos.X, (Int32)pos.Y, color);
     }
 
-    public void DrawRect(int x, int y, int w, int h, Color c)
+    public void DrawRect(Int32 x, Int32 y, Int32 w, Int32 h, Color c)
     {
-        DrawLine(x, y, x + w, y, c);
-        DrawLine(x + w, y, x + w, y + h, c);
-        DrawLine(x + w, y + h, x, y + h, c);
-        DrawLine(x, y + h, x, y, c);
+        this.DrawLine(x, y, x + w, y, c);
+        this.DrawLine(x + w, y, x + w, y + h, c);
+        this.DrawLine(x + w, y + h, x, y + h, c);
+        this.DrawLine(x, y + h, x, y, c);
     }
 
     public void DrawRect(Vector2 p, Vector2 s, Color c)
     {
-        DrawRect((int)p.X, (int)p.Y, (int)s.X, (int)s.Y, c);
+        this.DrawRect((Int32)p.X, (Int32)p.Y, (Int32)s.X, (Int32)s.Y, c);
     }
 
-    public void FillRect(int x, int y, int w, int h, Color c)
+    public void FillRect(Int32 x, Int32 y, Int32 w, Int32 h, Color c)
     {
-        int x2 = x + w;
-        int y2 = y + h;
+        Int32 x2 = x + w;
+        Int32 y2 = y + h;
 
-        for (int i = x; i < x2; i++)
+        for (Int32 i = x; i < x2; i++)
         {
-            for (int j = y; j < y2; j++)
-                DrawPixel(i, j, c);
+            for (Int32 j = y; j < y2; j++) this.DrawPixel(i, j, c);
         }
     }
 
     public void FillRect(Vector2 p, Vector2 s, Color c)
     {
-        FillRect((int)p.X, (int)p.Y, (int)s.X, (int)s.Y, c);
+        this.FillRect((Int32)p.X, (Int32)p.Y, (Int32)s.X, (Int32)s.Y, c);
     }
 
-    public void DrawLine(int x1, int y1, int x2, int y2, Color c)
+    public void DrawLine(Int32 x1, Int32 y1, Int32 x2, Int32 y2, Color c)
     {
-        int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+        Int32 x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
         dx = x2 - x1;
         dy = y2 - y1;
         dx1 = Math.Abs(dx);
@@ -143,7 +136,7 @@ public class PixelRenderer
                 xe = x1;
             }
 
-            DrawPixel(x, y, c);
+            this.DrawPixel(x, y, c);
 
             for (i = 0; x < xe; i++)
             {
@@ -158,7 +151,7 @@ public class PixelRenderer
                     px = px + 2 * (dy1 - dx1);
                 }
 
-                DrawPixel(x, y, c);
+                this.DrawPixel(x, y, c);
             }
         }
         else
@@ -176,7 +169,7 @@ public class PixelRenderer
                 ye = y1;
             }
 
-            DrawPixel(x, y, c);
+            this.DrawPixel(x, y, c);
 
             for (i = 0; y < ye; i++)
             {
@@ -191,16 +184,16 @@ public class PixelRenderer
                     py = py + 2 * (dx1 - dy1);
                 }
 
-                DrawPixel(x, y, c);
+                this.DrawPixel(x, y, c);
             }
         }
     }
 
-    public void DrawWireFrameModel(List<Vector2> vecModelCoordinates, float x, float y, float r, float s, Color col)
+    public void DrawWireFrameModel(List<Vector2> vecModelCoordinates, Single x, Single y, Single r, Single s, Color col)
     {
         // Create translated model vector of coordinate pairs
         var vecTransformedCoordinates = new List<Vector2>();
-        int verts = vecModelCoordinates.Count;
+        Int32 verts = vecModelCoordinates.Count;
 
         Matrix translation = Matrix.CreateTranslation(x, y, 0);
         Matrix rotation = Matrix.CreateRotationZ(r);
@@ -212,38 +205,43 @@ public class PixelRenderer
         world *= translation;
 
 
-        for (int i = 0; i < verts; i++) vecTransformedCoordinates.Add(Vector2.Transform(vecModelCoordinates[i], world));
+        for (Int32 i = 0; i < verts; i++) vecTransformedCoordinates.Add(Vector2.Transform(vecModelCoordinates[i], world));
 
 
         // Draw Closed Polygon
-        for (int i = 0; i < (verts + 1); i++)
+        for (Int32 i = 0; i < (verts + 1); i++)
         {
-            int j = i + 1;
+            Int32 j = i + 1;
 
-            DrawLine
+            this.DrawLine
             (
-                (int)vecTransformedCoordinates[i % verts].X, (int)vecTransformedCoordinates[i % verts].Y,
-                (int)vecTransformedCoordinates[j % verts].X, (int)vecTransformedCoordinates[j % verts].Y, col
+                (Int32)vecTransformedCoordinates[i % verts].X, (Int32)vecTransformedCoordinates[i % verts].Y,
+                (Int32)vecTransformedCoordinates[j % verts].X, (Int32)vecTransformedCoordinates[j % verts].Y, col
             );
         }
     }
 
     public void ClearSimd(Color color)
     {
-        if (Avx2.IsSupported && (m_pixelData.Length >= 8))
+        if (Avx2.IsSupported && (this.m_pixelData.Length >= 8))
         {
             var colorVector = Vector256.Create(color.PackedValue);
-            int numVectors = m_pixelData.Length / 8;
+            Int32 numVectors = this.m_pixelData.Length / 8;
 
             unsafe
             {
-                fixed (Color* pixels = &m_pixelData[0])
+                fixed (Color* pixels = &this.m_pixelData[0])
                 {
-                    var pixelVectors = (Vector256<uint>*)pixels;
+                    var pixelVectors = (Vector256<UInt32>*)pixels;
 
-                    for (int i = 0; i < numVectors; i++) Avx.Store((uint*)(pixelVectors + i), colorVector);
+                    for (Int32 i = 0; i < numVectors; i++) Avx.Store((UInt32*)(pixelVectors + i), colorVector);
                 }
             }
         }
+    }
+
+    public void DrawPixel((Int32, Int32) coordinates, Color color)
+    {
+        this.DrawPixel(coordinates.Item1, coordinates.Item2, color);
     }
 }

@@ -1,7 +1,9 @@
-﻿namespace Asteroids2.Source.Input;
+﻿using System;
+
+namespace AstralAssault;
 
 public interface IMouseEventListener
 {
-    void OnMouseButtonEvent(object sender, MouseButtonEventArgs e);
-    void OnMouseMoveEvent(object sender, MouseMoveEventArgs e);
+    void OnMouseButtonEvent(Object sender, MouseButtonEventArgs e);
+    void OnMouseMoveEvent(Object sender, MouseMoveEventArgs e);
 }
