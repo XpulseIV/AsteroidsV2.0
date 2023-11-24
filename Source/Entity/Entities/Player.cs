@@ -37,7 +37,7 @@ namespace AstralAssault.Source.Entity.Entities
         private const Single Friction = 30;
         private const Single Pi = 3.14F;
         private const Single BulletSpeed = 250;
-        private const Int32 ShootSpeed = 200;
+        private const Int32 ShootSpeed = 1;
 
         public Player(GameplayState gameState, Vector2 position) :base(gameState, position)
         {
@@ -49,9 +49,9 @@ namespace AstralAssault.Source.Entity.Entities
 
             this.model = new List<Vector2>
             {
-                new Vector2(5.0f, 0.0f),
-                new Vector2(-2.5f, -2.5f),
-                new Vector2(-2.5f, 2.5f)
+                new(5.0f, 0.0f),
+                new(-2.5f, -2.5f),
+                new(-2.5f, 2.5f)
             };
             this.Color = Palette.GetColor(Palette.Colors.Blue8);
 
@@ -193,12 +193,12 @@ namespace AstralAssault.Source.Entity.Entities
                 }) return;
 
 
-            this.Ammo -= bulletType switch
+            /*this.Ammo -= bulletType switch
             {
                 BulletType.Light => LightAmmoCost,
                 BulletType.Heavy => HeavyAmmoCost,
                 _ => throw new ArgumentOutOfRangeException()
-            };
+            };*/
 
             Random rnd = new();
             String soundName = (bulletType == BulletType.Heavy ? "Heavy" : "") + "Shoot" + rnd.Next(1, 4);
@@ -331,6 +331,7 @@ namespace AstralAssault.Source.Entity.Entities
 
             this.UpdateMuzzlePositions();
             this.UpdateParticleEmitterPosition();
+            this._particleEmitter.Update(deltaTime);
         }
 
         private void UpdateMuzzlePositions() {

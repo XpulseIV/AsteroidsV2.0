@@ -58,7 +58,7 @@ public class GameplayState : GameState
         
         for (int i = 0; i < Entities.Count; i++) Entities[i].Update(deltaTime);
 
-        this.QuadTree.Update(deltaTime);
+        this.QuadTree.Update(deltaTime, this.Entities);
         this.EnemySpawner.Update(deltaTime);
         
     }

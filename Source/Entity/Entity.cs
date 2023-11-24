@@ -41,6 +41,7 @@ public class Entity
     {
         DoNothing,
         Wrap,
+        Bounce,
         Destroy
     }
 
@@ -62,23 +63,17 @@ public class Entity
 
         this.Position += this.Velocity * deltaTime;
 
+        this.Bounds.Location = this.Position.ToPoint() + new Point(-this.Bounds.Width/2, -this.Bounds.Height/2);
+
         switch (this.OutOfBoundsBehavior)
         {
             case OutOfBounds.DoNothing:
             {
                 break;
             }
-
-            case OutOfBounds.Destroy:
-            {
-                if (this.Position.X is < 0 or > Game1.TargetWidth || this.Position.Y is < 0 or > Game1.TargetHeight)
-                {
-                    this.Destroy();
-                }
-
+            case OutOfBounds.Bounce: {
                 break;
             }
-
             case OutOfBounds.Wrap:
             {
                 this.Position.X = this.Position.X switch
@@ -97,7 +92,13 @@ public class Entity
 
                 break;
             }
+            case OutOfBounds.Destroy: {
+                if (this.Position.X is < 0 or > Game1.TargetWidth || this.Position.Y is < 0 or > Game1.TargetHeight) {
+                    this.Destroy();
+                }
 
+                break;
+            }
             default:
             {
                 throw new ArgumentOutOfRangeException();
@@ -128,6 +129,7 @@ public class Entity
         if (this.IsActor) drawTasks.AddRange(this.CreateBarDrawTasks(this.HP, this.MaxHP, fullColor, this.HealthBarYOffset));
 
         this.GameState.Root.Renderer.DrawWireFrameModel(this.model, this.Position.X, this.Position.Y, this.Rotation, this.size, this.Color);
+        this.GameState.Root.Renderer.DrawRect(this.Bounds.X, this.Bounds.Y, this.Bounds.Width, this.Bounds.Height, Color.White);
 
         return drawTasks;
     }

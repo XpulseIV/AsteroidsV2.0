@@ -8,8 +8,6 @@ using MonoGame.Extended;
 public class QuadTree
 {
     private GameplayState _gameplayState;
-    // Use 0, 1 does not really work
-    private int m_collisionResponeThing = 0;
 
     private readonly int m_maxObjects = 4;
     private readonly int m_maxLevels = 7;
@@ -169,10 +167,8 @@ public class QuadTree
         = static (p1, r1, p2, r2) => MathF.Abs
             ((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y)) <= ((r1 + r2) * (r1 + r2));
 
-    public void Update(float deltaTime) {
+    public void Update(float deltaTime, List<Entity> entities) {
         Clear();
-
-        var entities = this._gameplayState.Entities;
         
         foreach (Entity ent in entities) Insert(ent);
 
@@ -202,84 +198,11 @@ public class QuadTree
                         -= fOverlap * (entities[i].Position - m_returnObjects[x].Position) / distance;
                     m_returnObjects[x].Position
                         += fOverlap * (entities[i].Position - m_returnObjects[x].Position) / distance;
-
-                    switch (m_collisionResponeThing) {
-                        case 0: {
-                            // Unknown gathering
-                            float v11 = entities[i].Velocity.Length();
-                            float v21 = m_returnObjects[x].Velocity.Length();
-
-                            int m11 = entities[i].mass;
-                            int m21 = m_returnObjects[x].mass;
-
-                            float angle11 = entities[i].Velocity.ToAngle();
-                            float angle21 = m_returnObjects[x].Velocity.ToAngle();
-
-                            float phi1 = angle11 - angle21;
-
-                            // Equation solving
-                            float v1Fx1
-                                = (v11 * MathF.Cos(angle11 - phi1) * (m11 - m21) +
-                                   2 * m21 * v21 * MathF.Cos(angle21 - phi1)) /
-                                (m11 + m21) * MathF.Cos
-                                    (phi1) + v11 * MathF.Sin(angle11 - phi1) * MathF.Cos(phi1 + MathF.PI / 2);
-
-                            float v1Fy1
-                                = (v11 * MathF.Cos(angle11 - phi1) * (m11 - m21) +
-                                   2 * m21 * v21 * MathF.Cos(angle21 - phi1)) /
-                                (m11 + m21) * MathF.Sin
-                                    (phi1) + v11 * MathF.Sin(angle11 - phi1) * MathF.Sin(phi1 + MathF.PI / 2);
-
-
-                            float v2Fx1
-                                = (v21 * MathF.Cos(angle21 - phi1) * (m21 - m11) +
-                                   2 * m11 * v11 * MathF.Cos(angle11 - phi1)) /
-                                (m21 + m11) * MathF.Cos
-                                    (phi1) + v21 * MathF.Sin(angle21 - phi1) * MathF.Cos(phi1 + MathF.PI / 2);
-
-                            float v2Fy1
-                                = (v21 * MathF.Cos(angle21 - phi1) * (m21 - m11) +
-                                   2 * m11 * v11 * MathF.Cos(angle11 - phi1)) /
-                                (m21 + m11) * MathF.Sin
-                                    (phi1) + v21 * MathF.Sin(angle21 - phi1) * MathF.Sin(phi1 + MathF.PI / 2);
-
-                            entities[i].Velocity = new Vector2(v1Fx1, v1Fy1);
-                            m_returnObjects[x].Velocity = new Vector2(v2Fx1, v2Fy1);
-
-                            break;
-                        }
-
-                        case 1:
-                            Vector2 v12 = entities[i].Velocity;
-                            Vector2 v22 = m_returnObjects[x].Velocity;
-                            int m12 = entities[i].mass;
-                            int m22 = m_returnObjects[x].mass;
-
-                            Vector2 x1 = entities[i].Position;
-                            Vector2 x2 = m_returnObjects[x].Position;
-
-                            int e1P2 = 2 * m22 / (m12 + m22);
-                            int e2P2 = 2 * m12 / (m12 + m22);
-
-                            float e1P3 = Vector2.Dot(v12 - v22, x1 - x2) / (x1 - x2).LengthSquared();
-                            float e2P3 = Vector2.Dot(v22 - v12, x2 - x1) / (x2 - x1).LengthSquared();
-
-                            Vector2 e1P4 = x1 - x2;
-                            Vector2 e2P4 = x2 - x1;
-
-                            Vector2 e1P5 = v12 - e1P2 * e1P3 * e1P4;
-                            Vector2 e2P5 = v22 - e2P2 * e2P3 * e2P4;
-
-                            entities[i].Velocity = e1P5;
-                            m_returnObjects[x].Velocity = e2P5;
-
-                            break;
-                    }
                 }
 
 
-                entities[i].OnCollision(m_returnObjects[x]);
-                m_returnObjects[x].OnCollision(entities[i]);
+                //entities[i].OnCollision(m_returnObjects[x]);
+                //m_returnObjects[x].OnCollision(entities[i]);
             }
         }
     }

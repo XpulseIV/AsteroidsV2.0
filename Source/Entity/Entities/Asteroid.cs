@@ -77,7 +77,7 @@ public class Asteroid : Entity
                 throw new ArgumentOutOfRangeException();
         }
 
-        this.OutOfBoundsBehavior = OutOfBounds.Wrap;
+        this.OutOfBoundsBehavior = OutOfBounds.Bounce;
 
         this.IsActor = true;
         this.IsSolid = true;
