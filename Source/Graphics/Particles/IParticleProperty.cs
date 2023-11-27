@@ -1,5 +1,5 @@
-namespace AstralAssault;
-
-public interface IParticleProperty
+namespace AstralAssault.Source.Graphics.Particles
 {
+    public interface IParticleProperty
+    { }
 }

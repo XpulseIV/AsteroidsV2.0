@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace AstralAssault;
-
-public class UpdateEventArgs : EventArgs
+namespace AstralAssault.Source.Game
 {
-    public float DeltaTime { get; }
-
-    public UpdateEventArgs(float deltaTime)
+    public class UpdateEventArgs : EventArgs
     {
-        DeltaTime = deltaTime;
+        public float DeltaTime { get; }
+
+        public UpdateEventArgs(float deltaTime) {
+            this.DeltaTime = deltaTime;
+        }
     }
 }

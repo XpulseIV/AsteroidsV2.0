@@ -1,28 +1,29 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using AstralAssault.Source.Graphics;
 
-namespace AstralAssault;
-
-public class GameStateMachine
+namespace AstralAssault.Source.Game.GameState
 {
-    public GameState _currentState;
+    public class GameStateMachine
+    {
+        public GameState _currentState;
 
-    public GameStateMachine(GameState initialState) {
-        this._currentState = initialState;
-        this._currentState.Enter();
-    }
+        public GameStateMachine(GameState initialState) {
+            this._currentState = initialState;
+            this._currentState.Enter();
+        }
 
-    public void Update(float deltaTime) {
-        this._currentState.Update(deltaTime);
-    }
+        public void Update(float deltaTime) {
+            this._currentState.Update(deltaTime);
+        }
 
-    public List<DrawTask> GetDrawTasks() {
-        return this._currentState.GetDrawTasks();
-    }
+        public List<DrawTask> GetDrawTasks() {
+            return this._currentState.GetDrawTasks();
+        }
 
-    public void ChangeState(GameState newState) {
-        this._currentState?.Exit();
-        this._currentState = newState;
-        this._currentState.Enter();
+        public void ChangeState(GameState newState) {
+            this._currentState?.Exit();
+            this._currentState = newState;
+            this._currentState.Enter();
+        }
     }
 }

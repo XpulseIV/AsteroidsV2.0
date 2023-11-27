@@ -1,8 +1,9 @@
 ﻿using System;
 
-namespace AstralAssault;
-
-public interface IKeyboardEventListener
+namespace AstralAssault.Source.Input
 {
-    void OnKeyboardEvent(Object sender, KeyboardEventArgs e);
+    public interface IKeyboardEventListener
+    {
+        void OnKeyboardEvent(Object sender, KeyboardEventArgs e);
+    }
 }

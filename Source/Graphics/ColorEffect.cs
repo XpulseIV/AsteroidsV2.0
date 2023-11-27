@@ -1,13 +1,13 @@
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
-namespace AstralAssault;
-
-public struct ColorEffect : IDrawTaskEffect
+namespace AstralAssault.Source.Graphics
 {
-    public Vector4 Color { get; }
-
-    public ColorEffect(Vector4 color)
+    public struct ColorEffect : IDrawTaskEffect
     {
-        this.Color = color;
+        public Vector4 Color { get; }
+
+        public ColorEffect(Vector4 color) {
+            this.Color = color;
+        }
     }
 }

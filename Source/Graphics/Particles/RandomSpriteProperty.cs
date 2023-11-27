@@ -1,17 +1,17 @@
 using System;
 
-namespace AstralAssault;
-
-public struct RandomSpriteProperty : IParticleProperty
+namespace AstralAssault.Source.Graphics.Particles
 {
-    private readonly Random _rnd = new();
-    private readonly Int32 _rangeStart;
-    private readonly Int32 _rangeEnd;
-    public Int32 SpriteIndex => this._rnd.Next(this._rangeStart, this._rangeEnd + 1);
-
-    public RandomSpriteProperty(Int32 rangeStart, Int32 rangeEnd)
+    public struct RandomSpriteProperty : IParticleProperty
     {
-        this._rangeStart = rangeStart;
-        this._rangeEnd = rangeEnd;
+        private readonly Random _rnd = new();
+        private readonly Int32 _rangeStart;
+        private readonly Int32 _rangeEnd;
+        public Int32 SpriteIndex => this._rnd.Next(this._rangeStart, this._rangeEnd + 1);
+
+        public RandomSpriteProperty(Int32 rangeStart, Int32 rangeEnd) {
+            this._rangeStart = rangeStart;
+            this._rangeEnd = rangeEnd;
+        }
     }
 }

@@ -1,5 +1,5 @@
-namespace AstralAssault;
-
-public interface IDrawTaskEffect
+namespace AstralAssault.Source.Graphics
 {
+    public interface IDrawTaskEffect
+    { }
 }

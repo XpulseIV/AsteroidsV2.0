@@ -1,14 +1,15 @@
-namespace AstralAssault;
-
-public enum LayerDepth
+namespace AstralAssault.Source.Graphics
 {
-    Background,
-    Debris,
-    ThrusterFlame,
-    Foreground,
-    Explosions,
-    HealthBar,
-    HUD,
-    Crosshair,
-    Debug
+    public enum LayerDepth
+    {
+        Background,
+        Debris,
+        ThrusterFlame,
+        Foreground,
+        Explosions,
+        HealthBar,
+        HUD,
+        Crosshair,
+        Debug
+    }
 }

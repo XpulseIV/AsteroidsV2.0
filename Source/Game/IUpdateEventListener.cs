@@ -1,6 +1,7 @@
-﻿namespace AstralAssault;
-
-public interface IUpdateEventListener
+﻿namespace AstralAssault.Source.Game
 {
-    void Update(object sender, UpdateEventArgs e);
+    public interface IUpdateEventListener
+    {
+        void Update(object sender, UpdateEventArgs e);
+    }
 }

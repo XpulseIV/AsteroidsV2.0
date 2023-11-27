@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AstralAssault
+namespace AstralAssault.Source.Graphics
 {
     public sealed class EffectContainer
     {
@@ -12,19 +12,16 @@ namespace AstralAssault
 
         internal EffectContainer() => this.Effects = new();
 
-        internal void SetEffect<TEffect, TParameter>(TParameter parameter)
-        {
+        internal void SetEffect<TEffect, TParameter>(TParameter parameter) {
             if (!this.Effects.OfType<TEffect>().Any())
                 this.Effects.Add((IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter));
-            else
-            {
+            else {
                 Int32 index = this.Effects.IndexOf((IDrawTaskEffect)this.Effects.OfType<TEffect>().First());
                 this.Effects[index] = (IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter);
             }
         }
 
-        internal void RemoveEffect<TEffect>()
-        {
+        internal void RemoveEffect<TEffect>() {
             if (!this.Effects.OfType<TEffect>().Any()) return;
 
             Int32 index = this.Effects.IndexOf((IDrawTaskEffect)this.Effects.OfType<TEffect>().First());

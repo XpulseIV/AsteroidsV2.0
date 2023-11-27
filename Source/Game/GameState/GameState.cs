@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
+using AstralAssault.Source.Graphics;
 
-namespace AstralAssault;
-
-public abstract class GameState
+namespace AstralAssault.Source.Game.GameState
 {
-    public readonly Game1 Root;
-
-    public GameState(Game1 root)
+    public abstract class GameState
     {
-        this.Root = root;
-    }
+        public readonly Game1 Root;
 
-    public abstract void Enter();
-    public abstract void Exit();
-    public abstract void Update(float deltaTime);
-    public abstract List<DrawTask> GetDrawTasks();
+        public GameState(Game1 root) {
+            this.Root = root;
+        }
+
+        public abstract void Enter();
+        public abstract void Exit();
+        public abstract void Update(float deltaTime);
+        public abstract List<DrawTask> GetDrawTasks();
+    }
 }

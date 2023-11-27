@@ -1,86 +1,77 @@
 ﻿using System;
-using System.Collections.Generic;
+using AstralAssault.Source.Entity.Entities;
+using AstralAssault.Source.Game.GameState;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
-namespace AstralAssault;
-
-public class EnemySpawner
+namespace AstralAssault.Source.Game
 {
-    public Int32 EnemiesKilled { get; set; }
-
-    private readonly GameplayState _gameState;
-
-    private const Single BaseAsteroidSpawnInterval = 24000;
-    private Single _asteroidSpawnInterval = BaseAsteroidSpawnInterval;
-    private Int64 _lastAsteroidSpawnTime;
-
-    private readonly Int64 _timeStarted = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-    public EnemySpawner(GameplayState gameState)
+    public class EnemySpawner
     {
-        this._gameState = gameState;
-    }
+        public Int32 EnemiesKilled { get; set; }
 
-    private void SpawnAsteroid()
-    {
-        Random rnd = new();
+        private readonly GameplayState _gameState;
 
-        Vector2 position = GenerateEnemyPosition();
-        Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
+        private const Single BaseAsteroidSpawnInterval = 24000;
+        private Single _asteroidSpawnInterval = BaseAsteroidSpawnInterval;
+        private Int64 _lastAsteroidSpawnTime;
 
-        Vector2 gameCenter = new(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
-        Single angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
-        angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
+        private readonly Int64 _timeStarted = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        this._gameState.Entities.Add(new Asteroid(this._gameState, position, angleToCenter, size));
-    }
-
-    public void Update(float deltaTime)
-    {
-        Int64 timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-        if (timeNow - this._lastAsteroidSpawnTime > this._asteroidSpawnInterval)
-        {
-            this._lastAsteroidSpawnTime = timeNow;
-            this.SpawnAsteroid();
+        public EnemySpawner(GameplayState gameState) {
+            this._gameState = gameState;
         }
 
-        this._asteroidSpawnInterval = BaseAsteroidSpawnInterval * MathF.Pow(0.96F, this.EnemiesKilled);
+        private void SpawnAsteroid() {
+            Random rnd = new();
 
-        if (this._gameState.EnemiesAlive == 0)
-        {
-            this._asteroidSpawnInterval = 0;
+            Vector2 position = GenerateEnemyPosition();
+            Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
+
+            Vector2 gameCenter = new(Game1.GameWidth / 2F, Game1.GameHeight / 2F);
+            Single angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
+            angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
+
+            this._gameState.Entities.Add(new Asteroid(this._gameState, position, angleToCenter, size));
         }
-    }
 
-    public void StopListening()
-    {
-    }
+        public void Update(float deltaTime) {
+            Int64 timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-    private static Vector2 GenerateEnemyPosition()
-    {
-        Random rnd = new();
-        Int32 side = rnd.Next(0, 4);
+            if (timeNow - this._lastAsteroidSpawnTime > this._asteroidSpawnInterval) {
+                this._lastAsteroidSpawnTime = timeNow;
+                this.SpawnAsteroid();
+            }
 
-        Int32 x = side switch
-        {
-            0 => 0,
-            1 => Game1.TargetWidth,
-            2 => rnd.Next(0, Game1.TargetWidth),
-            3 => rnd.Next(0, Game1.TargetWidth),
-            _ => throw new ArgumentOutOfRangeException()
-        };
+            this._asteroidSpawnInterval = BaseAsteroidSpawnInterval * MathF.Pow(0.96F, this.EnemiesKilled);
 
-        Int32 y = side switch
-        {
-            0 => rnd.Next(0, Game1.TargetHeight),
-            1 => rnd.Next(0, Game1.TargetHeight),
-            2 => 0,
-            3 => Game1.TargetHeight,
-            _ => throw new ArgumentOutOfRangeException()
-        };
+            if (this._gameState.EnemiesAlive == 0) {
+                this._asteroidSpawnInterval = 0;
+            }
+        }
 
-        return new Vector2(x, y);
+        public void StopListening() { }
+
+        private static Vector2 GenerateEnemyPosition() {
+            Random rnd = new();
+            Int32 side = rnd.Next(0, 4);
+
+            Int32 x = side switch {
+                0 => 0,
+                1 => Game1.GameWidth,
+                2 => rnd.Next(0, Game1.GameWidth),
+                3 => rnd.Next(0, Game1.GameWidth),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            Int32 y = side switch {
+                0 => rnd.Next(0, Game1.GameHeight),
+                1 => rnd.Next(0, Game1.GameHeight),
+                2 => 0,
+                3 => Game1.GameHeight,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            return new Vector2(x, y);
+        }
     }
 }

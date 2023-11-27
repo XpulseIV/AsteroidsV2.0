@@ -1,21 +1,21 @@
 using System;
 
-namespace AstralAssault;
-
-public struct CauseOfDeathProperty : IParticleProperty
+namespace AstralAssault.Source.Graphics.Particles
 {
-    public enum CausesOfDeath
+    public struct CauseOfDeathProperty : IParticleProperty
     {
-        OutOfBounds,
-        LifeSpan
-    }
+        public enum CausesOfDeath
+        {
+            OutOfBounds,
+            LifeSpan
+        }
 
-    public CausesOfDeath CauseOfDeath { get; }
-    public Int32 LifeSpan { get; }
+        public CausesOfDeath CauseOfDeath { get; }
+        public Int32 LifeSpan { get; }
 
-    public CauseOfDeathProperty(CausesOfDeath causeOfDeath, Int32 lifeSpan = 0)
-    {
-        this.CauseOfDeath = causeOfDeath;
-        this.LifeSpan = lifeSpan;
+        public CauseOfDeathProperty(CausesOfDeath causeOfDeath, Int32 lifeSpan = 0) {
+            this.CauseOfDeath = causeOfDeath;
+            this.LifeSpan = lifeSpan;
+        }
     }
 }

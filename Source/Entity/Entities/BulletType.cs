@@ -1,7 +1,8 @@
-namespace AstralAssault;
-
-public enum BulletType
+namespace AstralAssault.Source.Entity.Entities
 {
-    Light,
-    Heavy
+    public enum BulletType
+    {
+        Light,
+        Heavy
+    }
 }

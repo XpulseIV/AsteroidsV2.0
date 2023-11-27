@@ -1,6 +1,5 @@
-﻿namespace AstralAssault;
-
-public interface IInputEventListener : IKeyboardEventListener, IMouseEventListener
+﻿namespace AstralAssault.Source.Input
 {
-
+    public interface IInputEventListener : IKeyboardEventListener, IMouseEventListener
+    { }
 }

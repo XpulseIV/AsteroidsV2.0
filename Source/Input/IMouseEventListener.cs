@@ -1,9 +1,10 @@
 ﻿using System;
 
-namespace AstralAssault;
-
-public interface IMouseEventListener
+namespace AstralAssault.Source.Input
 {
-    void OnMouseButtonEvent(Object sender, MouseButtonEventArgs e);
-    void OnMouseMoveEvent(Object sender, MouseMoveEventArgs e);
+    public interface IMouseEventListener
+    {
+        void OnMouseButtonEvent(Object sender, MouseButtonEventArgs e);
+        void OnMouseMoveEvent(Object sender, MouseMoveEventArgs e);
+    }
 }

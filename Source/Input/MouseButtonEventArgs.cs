@@ -1,14 +1,14 @@
 ﻿using System;
-using static AstralAssault.InputEventSource;
+using static AstralAssault.Source.Input.InputEventSource;
 
-namespace AstralAssault;
-
-public class MouseButtonEventArgs : EventArgs
+namespace AstralAssault.Source.Input
 {
-    public MouseButtons Button { get; }
-
-    public MouseButtonEventArgs(MouseButtons button)
+    public class MouseButtonEventArgs : EventArgs
     {
-        this.Button = button;
+        public MouseButtons Button { get; }
+
+        public MouseButtonEventArgs(MouseButtons button) {
+            this.Button = button;
+        }
     }
 }

@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AstralAssault.Source.Game;
+using AstralAssault.Source.Game.GameState;
+using AstralAssault.Source.Graphics;
+using AstralAssault.Source.Graphics.Particles;
+using AstralAssault.Source.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
-using MouseButtons = AstralAssault.InputEventSource.MouseButtons;
+using MouseButtons = AstralAssault.Source.Input.InputEventSource.MouseButtons;
 
 namespace AstralAssault.Source.Entity.Entities
 {
-    public class Player : AstralAssault.Entity, IInputEventListener
+    public class Player : Entity, IInputEventListener
     {
         public Single Multiplier = 1;
 
@@ -23,7 +28,7 @@ namespace AstralAssault.Source.Entity.Entities
         private const Int32 AmmoBarWidth = 46;
         private const Int32 AmmoBarHeight = 16;
         private const Int32 AmmoBarX = 4;
-        private const Int32 AmmoBarY = Game1.TargetHeight - AmmoBarHeight - 4;
+        private const Int32 AmmoBarY = Game1.GameHeight - AmmoBarHeight - 4;
 
         private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
         private Boolean _lastCannon;
@@ -39,16 +44,14 @@ namespace AstralAssault.Source.Entity.Entities
         private const Single BulletSpeed = 250;
         private const Int32 ShootSpeed = 1;
 
-        public Player(GameplayState gameState, Vector2 position) :base(gameState, position)
-        {
+        public Player(GameplayState gameState, Vector2 position) : base(gameState, position) {
             this.Position = position;
             this.Rotation = 0;
             this.size = 1;
-            
-            Bounds = new Rectangle((int)position.X, (int)position.Y, 6, 6);
 
-            this.model = new List<Vector2>
-            {
+            this.Bounds = new Rectangle((int)position.X, (int)position.Y, 6, 6);
+
+            this.model = new List<Vector2> {
                 new(5.0f, 0.0f),
                 new(-2.5f, -2.5f),
                 new(-2.5f, 2.5f)
@@ -61,7 +64,7 @@ namespace AstralAssault.Source.Entity.Entities
 
             this.StartListening();
 
-            this.OutOfBoundsBehavior = OutOfBounds.Wrap;
+            this.OutOfBoundsBehavior = OutOfBounds.Bounce;
 
             this.IsActor = true;
             this.MaxHP = 50;
@@ -72,24 +75,20 @@ namespace AstralAssault.Source.Entity.Entities
             this.mass = 7;
         }
 
-        private void InitParticleEmitter()
-        {
+        private void InitParticleEmitter() {
             Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("Particle");
 
-            Rectangle[] textureSources =
-            {
+            Rectangle[] textureSources = {
                 new(24, 0, 8, 8),
                 new(16, 0, 8, 8),
                 new(8, 0, 8, 8),
                 new(0, 0, 8, 8)
             };
 
-            IParticleProperty[] particleProperties =
-            {
+            IParticleProperty[] particleProperties = {
                 new CauseOfDeathProperty(CauseOfDeathProperty.CausesOfDeath.LifeSpan, 210),
                 new ColorChangeProperty(
-                    new[]
-                    {
+                    new[] {
                         Palette.Colors.Blue9,
                         Palette.Colors.Blue8,
                         Palette.Colors.Blue7,
@@ -111,16 +110,13 @@ namespace AstralAssault.Source.Entity.Entities
                 LayerDepth.ThrusterFlame);
         }
 
-        public override List<DrawTask> GetDrawTasks()
-        {
+        public override List<DrawTask> GetDrawTasks() {
             List<DrawTask> drawTasks = new();
 
-            if (this._thrusterIsOn)
-            {
+            if (this._thrusterIsOn) {
                 this._particleEmitter.StartSpawning();
             }
-            else
-            {
+            else {
                 this._particleEmitter.StopSpawning();
             }
 
@@ -134,23 +130,20 @@ namespace AstralAssault.Source.Entity.Entities
             return drawTasks;
         }
 
-        private void StartListening()
-        {
+        private void StartListening() {
             InputEventSource.KeyboardEvent += this.OnKeyboardEvent;
             InputEventSource.MouseMoveEvent += this.OnMouseMoveEvent;
             InputEventSource.MouseButtonEvent += this.OnMouseButtonEvent;
         }
 
-        private void StopListening()
-        {
+        private void StopListening() {
             InputEventSource.KeyboardEvent -= this.OnKeyboardEvent;
             InputEventSource.MouseMoveEvent -= this.OnMouseMoveEvent;
             InputEventSource.MouseButtonEvent -= this.OnMouseButtonEvent;
             this._particleEmitter.StopListening();
         }
 
-        private void HandleMovement(Int32 yAxis)
-        {
+        private void HandleMovement(Int32 yAxis) {
             // acceleration and deceleration
             Vector2 forward = new Vector2(
                 (Single)Math.Cos(this.Rotation),
@@ -161,26 +154,22 @@ namespace AstralAssault.Source.Entity.Entities
                 Math.Clamp(this.Velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
                 Math.Clamp(this.Velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
 
-            if (this.Velocity.Length() > MaxSpeed)
-            {
+            if (this.Velocity.Length() > MaxSpeed) {
                 this.Velocity.Normalize();
                 this.Velocity *= MaxSpeed;
             }
-            else if (this.Velocity.Length() < -MaxSpeed)
-            {
+            else if (this.Velocity.Length() < -MaxSpeed) {
                 this.Velocity.Normalize();
                 this.Velocity *= -MaxSpeed;
             }
         }
 
-        private void HandleFiring(MouseButtons mouseButton)
-        {
+        private void HandleFiring(MouseButtons mouseButton) {
             Int64 timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
             if (this._lastTimeFired + ShootSpeed > timeNow) return;
 
-            BulletType bulletType = mouseButton switch
-            {
+            BulletType bulletType = mouseButton switch {
                 MouseButtons.Left => BulletType.Light,
                 MouseButtons.Right => BulletType.Heavy,
                 _ => throw new ArgumentOutOfRangeException()
@@ -215,8 +204,7 @@ namespace AstralAssault.Source.Entity.Entities
             this._lastCannon = !this._lastCannon;
         }
 
-        private List<DrawTask> GetAmmoBarDrawTasks()
-        {
+        private List<DrawTask> GetAmmoBarDrawTasks() {
             DrawTask emptyDrawTask = new(this._ammoBarTexture,
                 new Rectangle(0, 0, AmmoBarWidth, AmmoBarHeight),
                 new Vector2(AmmoBarX, AmmoBarY),
@@ -241,14 +229,12 @@ namespace AstralAssault.Source.Entity.Entities
             return new List<DrawTask>() { emptyDrawTask, fullDrawTask };
         }
 
-        public override void OnCollision(AstralAssault.Entity other)
-        {
+        public override void OnCollision(Entity other) {
             base.OnCollision(other);
 
             if (other is not Asteroid) return;
 
-            if (this.Multiplier > 1)
-            {
+            if (this.Multiplier > 1) {
                 Jukebox.PlaySound("MultiplierBroken");
             }
 
@@ -256,8 +242,7 @@ namespace AstralAssault.Source.Entity.Entities
 
             Random rnd = new();
 
-            String soundName = rnd.Next(3) switch
-            {
+            String soundName = rnd.Next(3) switch {
                 0 => "Hurt1",
                 1 => "Hurt2",
                 2 => "Hurt3",
@@ -267,20 +252,17 @@ namespace AstralAssault.Source.Entity.Entities
             Jukebox.PlaySound(soundName, 0.5F);
         }
 
-        public void HandleDamage(Single damage)
-        {
+        public void HandleDamage(Single damage) {
             this.HP -= damage;
         }
 
-        public override void Destroy()
-        {
+        public override void Destroy() {
             this.StopListening();
 
             base.Destroy();
         }
 
-        protected override void OnDeath()
-        {
+        protected override void OnDeath() {
             Game1 root = this.GameState.Root;
 
             Jukebox.PlaySound("GameOver");
@@ -368,9 +350,11 @@ namespace AstralAssault.Source.Entity.Entities
 
             {
                 var x2 =
-                    (Single)(emitterPosition.X * Math.Cos(emitterRotation) + emitterPosition.Y * Math.Sin(emitterRotation));
+                    (Single)(emitterPosition.X * Math.Cos(emitterRotation) +
+                             emitterPosition.Y * Math.Sin(emitterRotation));
                 var y2 =
-                    (Single)(emitterPosition.Y * Math.Cos(emitterRotation) + emitterPosition.X * Math.Sin(emitterRotation));
+                    (Single)(emitterPosition.Y * Math.Cos(emitterRotation) +
+                             emitterPosition.X * Math.Sin(emitterRotation));
 
                 emitterPosition = new Vector2(this.Position.X + x2, this.Position.Y + y2);
             }
@@ -385,7 +369,8 @@ namespace AstralAssault.Source.Entity.Entities
                 var direction = (Single)Math.Atan2(this.Velocity.Y, this.Velocity.X);
 
                 this.Velocity -=
-                    new Vector2((Single)Math.Cos(direction), (Single)Math.Sin(direction)) * Friction * this._delta * sign;
+                    new Vector2((Single)Math.Cos(direction), (Single)Math.Sin(direction)) * Friction * this._delta *
+                    sign;
             }
         }
     }

@@ -1,15 +1,15 @@
 using System;
 
-namespace AstralAssault;
-
-public struct ColorChangeProperty : IParticleProperty
+namespace AstralAssault.Source.Graphics.Particles
 {
-    public Palette.Colors[] Colors { get; }
-    public Int32 TimeBetweenColorsMS { get; }
-
-    public ColorChangeProperty(Palette.Colors[] colors, Int32 timeBetweenColorsMS)
+    public struct ColorChangeProperty : IParticleProperty
     {
-        this.Colors = colors;
-        this.TimeBetweenColorsMS = timeBetweenColorsMS;
+        public Palette.Colors[] Colors { get; }
+        public Int32 TimeBetweenColorsMS { get; }
+
+        public ColorChangeProperty(Palette.Colors[] colors, Int32 timeBetweenColorsMS) {
+            this.Colors = colors;
+            this.TimeBetweenColorsMS = timeBetweenColorsMS;
+        }
     }
 }

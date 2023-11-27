@@ -1,4 +1,4 @@
-﻿using AstralAssault;
+﻿using AstralAssault.Source.Game;
 
 using Game1 game = new();
 game.Run();

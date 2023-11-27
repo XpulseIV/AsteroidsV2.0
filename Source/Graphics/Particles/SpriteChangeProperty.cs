@@ -1,17 +1,17 @@
 using System;
 
-namespace AstralAssault;
-
-public struct SpriteChangeProperty : IParticleProperty
+namespace AstralAssault.Source.Graphics.Particles
 {
-    public Int32 StartIndex { get; }
-    public Int32 EndIndex { get; }
-    public Int32 TimeBetweenChangesMS { get; }
-
-    public SpriteChangeProperty(Int32 startIndex, Int32 endIndex, Int32 timeBetweenChangesMS)
+    public struct SpriteChangeProperty : IParticleProperty
     {
-        this.StartIndex = startIndex;
-        this.EndIndex = endIndex;
-        this.TimeBetweenChangesMS = timeBetweenChangesMS;
+        public Int32 StartIndex { get; }
+        public Int32 EndIndex { get; }
+        public Int32 TimeBetweenChangesMS { get; }
+
+        public SpriteChangeProperty(Int32 startIndex, Int32 endIndex, Int32 timeBetweenChangesMS) {
+            this.StartIndex = startIndex;
+            this.EndIndex = endIndex;
+            this.TimeBetweenChangesMS = timeBetweenChangesMS;
+        }
     }
 }
