@@ -64,13 +64,13 @@ namespace AstralAssault.Source.Entity.Entities
                     this.MaxHP = 24;
                     this.HP = this.MaxHP;
                     this.ContactDamage = 7;
-                    this.mass = 12;
+                    this.mass = 7;
                     break;
                 case Sizes.Medium:
                     this.MaxHP = 36;
                     this.HP = this.MaxHP;
                     this.ContactDamage = 12;
-                    this.mass = 18;
+                    this.mass = 8;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

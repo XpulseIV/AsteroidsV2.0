@@ -42,7 +42,7 @@ namespace AstralAssault.Source.Entity.Entities
         private const Single Friction = 30;
         private const Single Pi = 3.14F;
         private const Single BulletSpeed = 250;
-        private const Int32 ShootSpeed = 1;
+        private const Int32 ShootSpeed = 200;
 
         public Player(GameplayState gameState, Vector2 position) : base(gameState, position) {
             this.Position = position;
@@ -320,8 +320,8 @@ namespace AstralAssault.Source.Entity.Entities
             Vector2 muzzle1;
             Vector2 muzzle2;
 
-            const Single x = 8;
-            const Single y = 10;
+            const Single x = -3;
+            const Single y = 6;
 
             {
                 Single rot = (Pi / 8) * (Single)Math.Round(this.Rotation / (Pi / 8));

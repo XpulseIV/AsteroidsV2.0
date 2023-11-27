@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AstralAssault.Source.Game;
 using AstralAssault.Source.Game.GameState;
 using Microsoft.Xna.Framework;
@@ -12,9 +13,14 @@ namespace AstralAssault.Source.Entity.Components
         public Entity Entity1 { get; }
         public Entity Entity2 { get; }
 
-        public CollisionPair(Entity entity1, Entity entity2) {
+        public int Entity1Index;
+        public int Entity2Index;
+
+        public CollisionPair(Entity entity1, Entity entity2, Int32 entity1Index, Int32 entity2Index) {
             this.Entity1 = entity1;
             this.Entity2 = entity2;
+            Entity1Index = entity1Index;
+            Entity2Index = entity2Index;
         }
     }
 
@@ -184,8 +190,15 @@ namespace AstralAssault.Source.Entity.Components
                             this.m_returnObjects[x].Bounds.Width
                         )) continue;
 
-                    // Store collisions for later processing
-                    collisions.Add(new CollisionPair(entities[i], this.m_returnObjects[x]));
+                    // Ensure unique pairs by comparing indices
+                    Boolean pairAlreadyAdded = collisions.Any(pair =>
+                        (pair.Entity1Index == i && pair.Entity2Index == x) ||
+                        (pair.Entity1Index == x && pair.Entity2Index == i));
+
+                    if (!pairAlreadyAdded) {
+                        // Store collisions for later processing
+                        collisions.Add(new CollisionPair(entities[i], this.m_returnObjects[x], i, x)); // Assuming CollisionPair takes indices as parameters
+                    }
                 }
             }
 
